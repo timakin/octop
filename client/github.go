@@ -11,12 +11,15 @@ type NotificationOptions struct {
 	mentioned      bool
 }
 
-func GetNotifications() {
+func GetNotifications() []github.Notification {
 	httpClient := newAuthenticatedClient()
 	ghCli := github.NewClient(httpClient)
-	repos, _, err := ghCli.Repositories.List("", nil)
-	fmt.Print(repos)
-	fmt.Print(err)
+	opt := &github.NotificationListOptions{All: true}
+	notifications, _, err := ghCli.Activity.ListNotifications(opt)
+	if err != nil {
+		panic(err)
+	}
+	return notifications
 }
 
 func GetIssues() []github.IssueEvent {

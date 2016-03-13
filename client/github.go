@@ -1,8 +1,6 @@
 package client
 
 import (
-	"fmt"
-
 	"github.com/google/go-github/github"
 )
 
@@ -33,12 +31,28 @@ func GetIssues() []github.IssueEvent {
 	return issueEvents
 }
 
-func GetPullRequests() {
+func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {
+	vsf := make([]github.Event, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}
+
+func GetPullRequests() []github.Event {
 	httpClient := newAuthenticatedClient()
 	ghCli := github.NewClient(httpClient)
-	pullreqs, _, err := ghCli.Repositories.List("", nil)
-	fmt.Print(pullreqs)
-	fmt.Print(err)
+	opt := &github.ListOptions{PerPage: 50}
+	events, _, err := ghCli.Activity.ListRepositoryEvents("rails", "rails", opt)
+	if err != nil {
+		panic(err)
+	}
+	pullreqs := EventFilter(events, func(e github.Event) bool {
+		return *e.Type == "PullRequestEvent"
+	})
+	return pullreqs
 }
 
 func GetListFollowingRepository() []github.Repository {

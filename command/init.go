@@ -12,7 +12,7 @@ import (
 func CmdInit(c *cli.Context) {
 	repos := client.GetListFollowingRepository()
 	for _, repo := range repos {
-		fmt.Print(*repo.Name)
+		fmt.Print(*repo.Organization.Name + *repo.Name)
 		fmt.Print("\n")
 		fmt.Print("\n")
 	}

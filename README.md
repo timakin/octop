@@ -37,7 +37,7 @@ https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 
 ## Notification tracking
 ```
-op
+op [ -r repo_selection_flag ]
 > list all repositories that you are watching.
 > And decided the repo, display events.
 
@@ -53,7 +53,7 @@ Type       | name |   created_at   |
 ```
 
 ```
-op issue [ -r repo_name ] [-p participating]
+op issue [ -r repo_selection_flag ] [-p participating]
 
 > list all repos you fallow, and select repository seeing names.
 > and show 10 latest issues.
@@ -68,7 +68,7 @@ Type       | name |   created_at   |
 ```
 
 ```
-op pr [ -r repo_name ]
+op pr [ -r repo_selection_flag ]
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 Type       | name |   created_at   |

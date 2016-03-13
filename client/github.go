@@ -40,3 +40,26 @@ func GetPullRequests() {
 	fmt.Print(pullreqs)
 	fmt.Print(err)
 }
+
+func GetListFollowingRepository() []github.Repository {
+	httpClient := newAuthenticatedClient()
+	ghCli := github.NewClient(httpClient)
+	opt := &github.ListOptions{PerPage: 50}
+	userId := getAuthenticatedUserId()
+	Repositories, _, err := ghCli.Activity.ListWatched(*userId, opt)
+	if err != nil {
+		panic(err)
+	}
+	return Repositories
+}
+
+// TODO: 引数でghCli引き回すのはアホなので、github cli 共通化 with interface
+func getAuthenticatedUserId() *string {
+	httpClient := newAuthenticatedClient()
+	ghCli := github.NewClient(httpClient)
+	User, _, err := ghCli.Users.Get("")
+	if err != nil {
+		panic(err)
+	}
+	return User.Login
+}

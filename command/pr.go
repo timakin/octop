@@ -39,9 +39,10 @@ func CmdPr(c *cli.Context) {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Print(*pullreqPayload.PullRequest.Title)
-
-		fmt.Print("\n")
-		fmt.Print("\n")
+		if *pullreqPayload.PullRequest.State == "open" {
+			fmt.Print(*pullreqPayload.PullRequest.Title)
+			fmt.Print("\n")
+			fmt.Print("\n")
+		}
 	}
 }

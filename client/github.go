@@ -11,8 +11,8 @@ type NotificationOptions struct {
 	mentioned      bool
 }
 
-func GetNotifications(token string) {
-	httpClient := Authenticate(token)
+func GetNotifications() {
+	httpClient := newAuthenticatedClient()
 	ghCli := github.NewClient(httpClient)
 	repos, _, err := ghCli.Repositories.List("", nil)
 	fmt.Print(repos)

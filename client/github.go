@@ -1,6 +1,9 @@
 package client
 
 import (
+	"fmt"
+	"log"
+
 	"github.com/google/go-github/github"
 )
 
@@ -41,6 +44,25 @@ func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {
 	return vsf
 }
 
+func NotificationFilter(vs []github.Notification, f func(github.Notification) bool) []github.Notification {
+	vsf := make([]github.Notification, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}
+
+func SortByNotificationCount(vs []github.Notification, f func(github.Notification) int) []github.Notification {
+	vsf := make([]github.Notification, 0)
+	for _, v := range vs {
+		count := countUnreadRepositoryNotification(v.Repository.Owner.Name, v.Repository.Name)
+		// countとrepositoryのmapを作る
+	}
+	// countをキーにしてソートする
+}
+
 func GetPullRequests() []github.Event {
 	httpClient := newAuthenticatedClient()
 	ghCli := github.NewClient(httpClient)
@@ -55,14 +77,24 @@ func GetPullRequests() []github.Event {
 	return pullreqs
 }
 
+func SelectRepository() {
+	repos := GetListFollowingRepository()
+	fmt.Print(repos)
+	for _, repo := range repos {
+		nofiticationCount := countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
+		fmt.Print(""*repo.Owner.Login + "/" + *repo.Name)
+		fmt.Print("\n")
+	}
+}
+
 func GetListFollowingRepository() []github.Repository {
 	httpClient := newAuthenticatedClient()
 	ghCli := github.NewClient(httpClient)
-	opt := &github.ListOptions{PerPage: 50}
+	opt := &github.ListOptions{PerPage: 100}
 	userId := getAuthenticatedUserId()
 	Repositories, _, err := ghCli.Activity.ListWatched(*userId, opt)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return Repositories
 }
@@ -76,4 +108,13 @@ func getAuthenticatedUserId() *string {
 		panic(err)
 	}
 	return User.Login
+}
+
+func countUnreadRepositoryNotification(owner *string, repoName *string) int {
+	// TODO: API叩き過ぎるのでcache c.f. https://github.com/patrickmn/go-cache/blob/master/README.md
+	notifications := GetNotifications()
+	unreadRepositoryNotifications := NotificationFilter(notifications, func(n github.Notification) bool {
+		return *n.Repository.Owner.Name == *owner && *n.Repository.Name == *repoName
+	})
+	return len(unreadRepositoryNotifications)
 }

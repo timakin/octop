@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"log"
+	"sort"
 
 	"github.com/google/go-github/github"
 )
@@ -10,6 +11,25 @@ import (
 type NotificationOptions struct {
 	repositoryName string
 	mentioned      bool
+}
+
+type RepoNotificationCounter struct {
+	Repository              *github.Repository
+	UnreadNotificationCount int
+}
+
+type RepoNotificationCounters []RepoNotificationCounter
+
+func (r RepoNotificationCounters) Len() int {
+	return len(r)
+}
+
+func (r RepoNotificationCounters) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+func (r RepoNotificationCounters) Less(i, j int) bool {
+	return r[i].UnreadNotificationCount < r[j].UnreadNotificationCount
 }
 
 func GetNotifications() []github.Notification {
@@ -54,15 +74,6 @@ func NotificationFilter(vs []github.Notification, f func(github.Notification) bo
 	return vsf
 }
 
-func SortByNotificationCount(vs []github.Notification, f func(github.Notification) int) []github.Notification {
-	vsf := make([]github.Notification, 0)
-	for _, v := range vs {
-		count := countUnreadRepositoryNotification(v.Repository.Owner.Name, v.Repository.Name)
-		// countとrepositoryのmapを作る
-	}
-	// countをキーにしてソートする
-}
-
 func GetPullRequests() []github.Event {
 	httpClient := newAuthenticatedClient()
 	ghCli := github.NewClient(httpClient)
@@ -78,13 +89,19 @@ func GetPullRequests() []github.Event {
 }
 
 func SelectRepository() {
+	var sortRepoCandidate []RepoNotificationCounter
 	repos := GetListFollowingRepository()
-	fmt.Print(repos)
 	for _, repo := range repos {
-		nofiticationCount := countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
-		fmt.Print(""*repo.Owner.Login + "/" + *repo.Name)
-		fmt.Print("\n")
+		unreadCount := countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
+		repoNotificationCounter := &RepoNotificationCounter{
+			Repository:              &repo,
+			UnreadNotificationCount: unreadCount,
+		}
+		sortRepoCandidate := append(sortRepoCandidate, *repoNotificationCounter)
 	}
+	sort.Sort(sortRepoCandidate)
+	fmt.Print(*repo.Owner.Login + "/" + *repo.Name)
+	fmt.Print("\n")
 }
 
 func GetListFollowingRepository() []github.Repository {

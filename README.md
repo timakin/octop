@@ -107,6 +107,15 @@ op explore
 - Use Cases
  - [Qiita](http://qiita.com/awakia/items/bd4cdfab2b552e2151ad)
 
+## TODO
+
+- [ ] select repos with order by notification count
+- [ ] peco integration and get result of selection
+- [ ] get list of unread pull requests, notificaitons, issues
+- [ ] -r (repo) option
+- [ ] stylish with ANSI color
+- [ ] list and check body of notification, and if touched, send PUT request to notify reading
+
 ## Contribution
 
 1. Fork ([https://github.com/timakin/op/fork](https://github.com/timakin/op/fork))

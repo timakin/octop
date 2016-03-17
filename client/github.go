@@ -89,7 +89,7 @@ func GetPullRequests() []github.Event {
 }
 
 func SelectRepository() {
-	var sortRepoCandidate []RepoNotificationCounter
+	var sortRepoCandidate RepoNotificationCounters
 	repos := GetListFollowingRepository()
 	for _, repo := range repos {
 		unreadCount := countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
@@ -100,8 +100,13 @@ func SelectRepository() {
 		sortRepoCandidate := append(sortRepoCandidate, *repoNotificationCounter)
 	}
 	sort.Sort(sortRepoCandidate)
-	fmt.Print(*repo.Owner.Login + "/" + *repo.Name)
-	fmt.Print("\n")
+	for _, v := range sortRepoCandidate {
+		fmt.Print("======================")
+		fmt.Print(v.UnreadNotificationCount)
+		fmt.Print(*v.Repository.Owner.Name)
+		fmt.Print(*v.Repository.Name)
+		fmt.Print("======================")
+	}
 }
 
 func GetListFollowingRepository() []github.Repository {

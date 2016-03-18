@@ -3,6 +3,7 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -54,7 +55,7 @@ func getToken() string {
 		var fp *os.File
 		fp, err = os.Open(tokenFile)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		scanner := bufio.NewScanner(fp)
 		token := strconv.Quote(scanner.Text())

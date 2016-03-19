@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"time"
 
 	"github.com/google/go-github/github"
 	"github.com/patrickmn/go-cache"
@@ -22,73 +21,32 @@ type RepoNotificationCounter struct {
 
 type RepoNotificationCounters []RepoNotificationCounter
 
-func (r RepoNotificationCounters) Len() int {
-	return len(r)
-}
-
-func (r RepoNotificationCounters) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
-}
-
-func (r RepoNotificationCounters) Less(i, j int) bool {
-	return r[i].UnreadNotificationCount < r[j].UnreadNotificationCount
-}
-
-func GetNotifications() []github.Notification {
-	// TODO: これもinterface
-	c := cache.New(5*time.Minute, 30*time.Second)
-	if cv, found := c.Get("notifications"); found {
-		fmt.Print("cache\n")
+func (i Instance) GetNotifications() []github.Notification {
+	if cv, found := i.cache.Get("notifications"); found {
 		cachedNotifications := cv.([]github.Notification)
 		return cachedNotifications
 	}
-	httpClient := newAuthenticatedClient()
-	ghCli := github.NewClient(httpClient)
 	opt := &github.NotificationListOptions{All: true}
-	notifications, _, err := ghCli.Activity.ListNotifications(opt)
+	notifications, _, err := i.ghCli.Activity.ListNotifications(opt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	c.Set("notifications", notifications, cache.DefaultExpiration)
+	i.cache.Set("notifications", notifications, cache.DefaultExpiration)
 	return notifications
 }
 
-func GetIssues() []github.IssueEvent {
-	httpClient := newAuthenticatedClient()
-	ghCli := github.NewClient(httpClient)
+func (i Instance) GetIssues() []github.IssueEvent {
 	opt := &github.ListOptions{PerPage: 10}
-	issueEvents, _, err := ghCli.Issues.ListRepositoryEvents("rails", "rails", opt)
+	issueEvents, _, err := i.ghCli.Issues.ListRepositoryEvents("rails", "rails", opt)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return issueEvents
 }
 
-func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {
-	vsf := make([]github.Event, 0)
-	for _, v := range vs {
-		if f(v) {
-			vsf = append(vsf, v)
-		}
-	}
-	return vsf
-}
-
-func NotificationFilter(vs []github.Notification, f func(github.Notification) bool) []github.Notification {
-	vsf := make([]github.Notification, 0)
-	for _, v := range vs {
-		if f(v) {
-			vsf = append(vsf, v)
-		}
-	}
-	return vsf
-}
-
-func GetPullRequests() []github.Event {
-	httpClient := newAuthenticatedClient()
-	ghCli := github.NewClient(httpClient)
+func (i Instance) GetPullRequests() []github.Event {
 	opt := &github.ListOptions{PerPage: 50}
-	events, _, err := ghCli.Activity.ListRepositoryEvents("rails", "rails", opt)
+	events, _, err := i.ghCli.Activity.ListRepositoryEvents("rails", "rails", opt)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -98,12 +56,12 @@ func GetPullRequests() []github.Event {
 	return pullreqs
 }
 
-func SelectRepository() {
+func (i Instance) SelectRepository() {
 	sortRepoCandidate := make(RepoNotificationCounters, 0)
-	repos := GetListFollowingRepository()
+	repos := i.GetListFollowingRepository()
 	for _, repo := range repos {
 		fmt.Print(*repo.Name)
-		unreadCount := countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
+		unreadCount := i.countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
 		repoNotificationCounter := &RepoNotificationCounter{
 			Repository:              &repo,
 			UnreadNotificationCount: unreadCount,
@@ -120,32 +78,26 @@ func SelectRepository() {
 	}
 }
 
-func GetListFollowingRepository() []github.Repository {
-	httpClient := newAuthenticatedClient()
-	ghCli := github.NewClient(httpClient)
+func (i Instance) GetListFollowingRepository() []github.Repository {
 	opt := &github.ListOptions{PerPage: 100}
-	userId := getAuthenticatedUserId()
-	Repositories, _, err := ghCli.Activity.ListWatched(*userId, opt)
+	userId := i.getAuthenticatedUserId()
+	Repositories, _, err := i.ghCli.Activity.ListWatched(*userId, opt)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return Repositories
 }
 
-// TODO: 引数でghCli引き回すのはアホなので、github cli 共通化 with interface
-func getAuthenticatedUserId() *string {
-	httpClient := newAuthenticatedClient()
-	ghCli := github.NewClient(httpClient)
-	User, _, err := ghCli.Users.Get("")
+func (i Instance) getAuthenticatedUserId() *string {
+	User, _, err := i.ghCli.Users.Get("")
 	if err != nil {
 		log.Fatal(err)
 	}
 	return User.Login
 }
 
-func countUnreadRepositoryNotification(owner *string, repoName *string) int {
-	// TODO: API叩き過ぎるのでcache c.f. https://github.com/patrickmn/go-cache/blob/master/README.md
-	notifications := GetNotifications()
+func (i Instance) countUnreadRepositoryNotification(owner *string, repoName *string) int {
+	notifications := i.GetNotifications()
 	unreadRepositoryNotifications := NotificationFilter(notifications, func(n github.Notification) bool {
 		//		fmt.Print(*n.Repository.Owner.Name)
 		//		fmt.Print(owner)

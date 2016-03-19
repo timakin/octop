@@ -19,7 +19,7 @@ type RepoNotificationCounter struct {
 	UnreadNotificationCount int
 }
 
-type RepoNotificationCounters []RepoNotificationCounter
+type RepoNotificationCounters []*RepoNotificationCounter
 
 func (i Instance) GetNotifications() []github.Notification {
 	if cv, found := i.cache.Get("notifications"); found {
@@ -45,7 +45,7 @@ func (i Instance) GetIssues() []github.IssueEvent {
 }
 
 func (i Instance) GetPullRequests() []github.Event {
-	opt := &github.ListOptions{PerPage: 50}
+	opt := &github.ListOptions{PerPage: 100}
 	events, _, err := i.ghCli.Activity.ListRepositoryEvents("rails", "rails", opt)
 	if err != nil {
 		log.Fatal(err)
@@ -60,21 +60,24 @@ func (i Instance) SelectRepository() {
 	sortRepoCandidate := make(RepoNotificationCounters, 0)
 	repos := i.GetListFollowingRepository()
 	for _, repo := range repos {
-		fmt.Print(*repo.Name)
 		unreadCount := i.countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
 		repoNotificationCounter := &RepoNotificationCounter{
 			Repository:              &repo,
 			UnreadNotificationCount: unreadCount,
 		}
-		sortRepoCandidate = append(sortRepoCandidate, *repoNotificationCounter)
+		sortRepoCandidate = append(sortRepoCandidate, repoNotificationCounter)
 	}
-	sort.Sort(sortRepoCandidate)
 	for _, v := range sortRepoCandidate {
-		fmt.Print("======================")
-		fmt.Print(v.UnreadNotificationCount)
-		fmt.Print(*v.Repository.Owner.Name)
-		fmt.Print(*v.Repository.Name)
-		fmt.Print("======================")
+		repo := *v
+		fmt.Print("======================\n")
+		fmt.Print("For Debug\n")
+		fmt.Print(repo.UnreadNotificationCount)
+		fmt.Print("\n")
+		fmt.Print(*repo.Repository.Owner.Login)
+		fmt.Print("\n")
+		fmt.Print(*repo.Repository.Name)
+		fmt.Print("\n")
+		fmt.Print("======================\n")
 	}
 }
 
@@ -99,11 +102,7 @@ func (i Instance) getAuthenticatedUserId() *string {
 func (i Instance) countUnreadRepositoryNotification(owner *string, repoName *string) int {
 	notifications := i.GetNotifications()
 	unreadRepositoryNotifications := NotificationFilter(notifications, func(n github.Notification) bool {
-		//		fmt.Print(*n.Repository.Owner.Name)
-		//		fmt.Print(owner)
-		//		fmt.Print(*n.Repository.Name)
-		//		fmt.Print(repoName)
-		return true //*n.Repository.Owner.Name == *owner && *n.Repository.Name == *repoName
+		return *n.Repository.Owner.Login == *owner && *n.Repository.Name == *repoName
 	})
 	return len(unreadRepositoryNotifications)
 }

@@ -8,5 +8,6 @@ import (
 )
 
 func CmdInit(c *cli.Context) {
-	client.SelectRepository()
+	instance := client.New()
+	instance.SelectRepository()
 }

@@ -23,7 +23,8 @@ func MapToStruct(m map[string]interface{}, val interface{}) error {
 }
 
 func CmdPr(c *cli.Context) {
-	pullreqs := client.GetPullRequests()
+	instance := client.New()
+	pullreqs := instance.GetPullRequests()
 	for _, pullreq := range pullreqs {
 		var pullreqPayload github.PullRequestEvent
 

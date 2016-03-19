@@ -10,7 +10,8 @@ import (
 )
 
 func CmdNotification(c *cli.Context) {
-	notifications := client.GetNotifications()
+	instance := client.New()
+	notifications := instance.GetNotifications()
 	for _, notification := range notifications {
 		color.Cyan("-------------------------------------------------")
 		fmt.Print("\n")

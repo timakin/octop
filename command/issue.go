@@ -9,7 +9,8 @@ import (
 )
 
 func CmdIssue(c *cli.Context) {
-	issues := client.GetIssues()
+	instance := client.New()
+	issues := instance.GetIssues()
 	for _, issue := range issues {
 		fmt.Print(issue.Issue.Labels)
 		fmt.Print("\n")

@@ -57,25 +57,26 @@ func (i Instance) GetPullRequests() []github.Event {
 }
 
 func (i Instance) SelectRepository() {
-	sortRepoCandidate := make(RepoNotificationCounters, 0)
 	repos := i.GetListFollowingRepository()
-	for _, repo := range repos {
+	sortRepoCandidate := make(RepoNotificationCounters, len(repos))
+	for index, repo := range repos {
 		unreadCount := i.countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
 		repoNotificationCounter := &RepoNotificationCounter{
-			Repository:              &repo,
+			Repository:              &repos[index],
 			UnreadNotificationCount: unreadCount,
 		}
-		sortRepoCandidate = append(sortRepoCandidate, repoNotificationCounter)
+		sortRepoCandidate[index] = repoNotificationCounter
+		fmt.Println(sortRepoCandidate[index])
 	}
+	sort.Sort(sortRepoCandidate)
 	for _, v := range sortRepoCandidate {
-		repo := *v
 		fmt.Print("======================\n")
 		fmt.Print("For Debug\n")
-		fmt.Print(repo.UnreadNotificationCount)
+		fmt.Print(v.UnreadNotificationCount)
 		fmt.Print("\n")
-		fmt.Print(*repo.Repository.Owner.Login)
+		fmt.Print(*v.Repository.Owner.Login)
 		fmt.Print("\n")
-		fmt.Print(*repo.Repository.Name)
+		fmt.Print(*v.Repository.Name)
 		fmt.Print("\n")
 		fmt.Print("======================\n")
 	}

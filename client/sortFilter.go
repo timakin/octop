@@ -13,7 +13,7 @@ func (r RepoNotificationCounters) Swap(i, j int) {
 }
 
 func (r RepoNotificationCounters) Less(i, j int) bool {
-	return r[i].UnreadNotificationCount < r[j].UnreadNotificationCount
+	return r[i].UnreadNotificationCount > r[j].UnreadNotificationCount
 }
 
 func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {

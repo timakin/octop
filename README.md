@@ -110,7 +110,6 @@ op explore
 ## TODO
 
 - [ ] select repos with order by notification count
-- [ ] record token to a static file
 - [ ] peco integration and get result of selection
 - [ ] get list of unread pull requests, notificaitons, issues
 - [ ] -r (repo) option

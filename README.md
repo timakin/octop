@@ -112,8 +112,6 @@ op explore
 - [ ] select repos with order by notification count
 - [ ] record token to a static file
 - [ ] peco integration and get result of selection
-- [ ] cache control with go-cache for notification endpoint requesting
-- [ ] Unify interface of github client code
 - [ ] get list of unread pull requests, notificaitons, issues
 - [ ] -r (repo) option
 - [ ] stylish with ANSI color

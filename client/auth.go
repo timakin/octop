@@ -41,14 +41,14 @@ func getToken() string {
 			}
 		}
 
-		//		fout, err := os.Create(tokenFile)
-		//		if err != nil {
-		//			fmt.Print("[Error] Couldn't create token record file.\n")
-		//			fmt.Print(err)
-		//			os.Exit(0)
-		//		}
-		//		fout.WriteString(token)
-		//		defer fout.Close()
+		fout, err := os.Create(tokenFile)
+		if err != nil {
+			fmt.Print("[Error] Couldn't create token record file.\n")
+			fmt.Print(err)
+			os.Exit(0)
+		}
+		fout.WriteString(token)
+		defer fout.Close()
 
 		return token
 	} else {

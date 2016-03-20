@@ -60,25 +60,23 @@ func (i Instance) SelectRepository() {
 	repos := i.GetListFollowingRepository()
 	sortRepoCandidate := make(RepoNotificationCounters, len(repos))
 	for index, repo := range repos {
+		repo := repo
 		unreadCount := i.countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
 		repoNotificationCounter := &RepoNotificationCounter{
-			Repository:              &repos[index],
+			Repository:              &repo,
 			UnreadNotificationCount: unreadCount,
 		}
 		sortRepoCandidate[index] = repoNotificationCounter
-		fmt.Println(sortRepoCandidate[index])
 	}
 	sort.Sort(sortRepoCandidate)
 	for _, v := range sortRepoCandidate {
 		fmt.Print("======================\n")
-		fmt.Print("For Debug\n")
 		fmt.Print(v.UnreadNotificationCount)
 		fmt.Print("\n")
 		fmt.Print(*v.Repository.Owner.Login)
 		fmt.Print("\n")
 		fmt.Print(*v.Repository.Name)
 		fmt.Print("\n")
-		fmt.Print("======================\n")
 	}
 }
 

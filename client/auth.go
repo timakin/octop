@@ -3,17 +3,17 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
-	"strconv"
 
 	"golang.org/x/oauth2"
 )
 
 func getToken() string {
-	const tokenFile = "/var/run/op_token"
+	const tokenFile = "/var/tmp/op_token"
 	const tokenMatcher = "([a-z0-9]{40})"
 	_, err := os.Stat(tokenFile)
 	var token string
@@ -52,13 +52,11 @@ func getToken() string {
 
 		return token
 	} else {
-		var fp *os.File
-		fp, err = os.Open(tokenFile)
+		f, err := ioutil.ReadFile(tokenFile)
 		if err != nil {
 			log.Fatal(err)
 		}
-		scanner := bufio.NewScanner(fp)
-		token := strconv.Quote(scanner.Text())
+		token := string(f)
 		return token
 	}
 }

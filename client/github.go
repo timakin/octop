@@ -1,13 +1,11 @@
 package client
 
 import (
-	"fmt"
 	"log"
 	"sort"
 
 	"github.com/google/go-github/github"
 	"github.com/patrickmn/go-cache"
-	"github.com/timakin/op/repl"
 )
 
 func (i Instance) GetNotifications() []github.Notification {
@@ -59,19 +57,6 @@ func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 	}
 	sort.Sort(repoNotificationCounters)
 	return repoNotificationCounters
-}
-
-func (i Instance) SelectRepository() {
-	repoNotificationCounters := i.GetRepoNotificationCounters()
-	repl.Interface(repoNotificationCounters)
-	selected, err := Interface()
-	if err != nil {
-		return err
-	}
-
-	for _, v := range selected {
-		fmt.Println(v + "\n")
-	}
 }
 
 func (i Instance) GetListFollowingRepository() []github.Repository {

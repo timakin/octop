@@ -112,7 +112,6 @@ op explore
 - [ ] select repos with order by notification count
 - [ ] peco integration and get result of selection
 - [ ] get list of unread pull requests, notificaitons, issues
-- [ ] -r (repo) option
 - [ ] stylish with ANSI color
 - [ ] list and check body of notification, and if touched, send PUT request to notify reading
 

@@ -70,7 +70,7 @@ func (i Instance) SelectRepository() {
 		sortRepoCandidate[index] = repoNotificationCounter
 	}
 	sort.Sort(sortRepoCandidate)
-	fmt.Print("======================\n")
+	fmt.Print("=========================================\n")
 	fmt.Print("Unread\t\tOwner\t\tRepository Name\n")
 	for _, v := range sortRepoCandidate {
 		fmt.Print(strconv.Itoa(v.UnreadNotificationCount) + "\t\t" + *v.Repository.Owner.Login + "\t\t" + *v.Repository.Name + "\n")

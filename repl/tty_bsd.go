@@ -1,6 +1,6 @@
 // +build darwin freebsd
 
-package op
+package repl
 
 import (
 	"os"

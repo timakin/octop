@@ -1,6 +1,6 @@
 // +build linux
 
-package op
+package repl
 
 import (
 	"os"

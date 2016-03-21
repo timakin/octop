@@ -4,23 +4,11 @@ import (
 	"fmt"
 	"log"
 	"sort"
-	"strconv"
 
 	"github.com/google/go-github/github"
 	"github.com/patrickmn/go-cache"
+	"github.com/timakin/op/repl"
 )
-
-type NotificationOptions struct {
-	repositoryName string
-	mentioned      bool
-}
-
-type RepoNotificationCounter struct {
-	Repository              *github.Repository
-	UnreadNotificationCount int
-}
-
-type RepoNotificationCounters []*RepoNotificationCounter
 
 func (i Instance) GetNotifications() []github.Notification {
 	if cv, found := i.cache.Get("notifications"); found {
@@ -57,9 +45,9 @@ func (i Instance) GetPullRequests() []github.Event {
 	return pullreqs
 }
 
-func (i Instance) SelectRepository() {
+func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 	repos := i.GetListFollowingRepository()
-	sortRepoCandidate := make(RepoNotificationCounters, len(repos))
+	repoNotificationCounters := make(RepoNotificationCounters, len(repos))
 	for index, repo := range repos {
 		repo := repo
 		unreadCount := i.countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
@@ -67,13 +55,22 @@ func (i Instance) SelectRepository() {
 			Repository:              &repo,
 			UnreadNotificationCount: unreadCount,
 		}
-		sortRepoCandidate[index] = repoNotificationCounter
+		repoNotificationCounters[index] = repoNotificationCounter
 	}
-	sort.Sort(sortRepoCandidate)
-	fmt.Print("=========================================\n")
-	fmt.Print("Unread\t\tOwner\t\tRepository Name\n")
-	for _, v := range sortRepoCandidate {
-		fmt.Print(strconv.Itoa(v.UnreadNotificationCount) + "\t\t" + *v.Repository.Owner.Login + "\t\t" + *v.Repository.Name + "\n")
+	sort.Sort(repoNotificationCounters)
+	return repoNotificationCounters
+}
+
+func (i Instance) SelectRepository() {
+	repoNotificationCounters := i.GetRepoNotificationCounters()
+	repl.Interface(repoNotificationCounters)
+	selected, err := Interface()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range selected {
+		fmt.Println(v + "\n")
 	}
 }
 

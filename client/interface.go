@@ -23,3 +23,15 @@ func New() *Instance {
 
 	return I
 }
+
+type NotificationOptions struct {
+	repositoryName string
+	mentioned      bool
+}
+
+type RepoNotificationCounter struct {
+	Repository              *github.Repository
+	UnreadNotificationCount int
+}
+
+type RepoNotificationCounters []*RepoNotificationCounter

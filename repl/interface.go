@@ -245,7 +245,10 @@ func Interface(repoNotificationCounters client.RepoNotificationCounters) (select
 	for _, line := range data {
 		ctx.lines = append(ctx.lines, NewLines(line))
 	}
-
+	err = termbox.Init()
+	if err != nil {
+		return
+	}
 	if isTty() {
 		termbox.SetInputMode(termbox.InputEsc)
 	}

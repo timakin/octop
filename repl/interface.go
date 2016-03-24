@@ -207,6 +207,8 @@ func drawScreen() {
 					termbox.SetCell(x, height-4-n, c, termbox.ColorDefault|termbox.AttrReverse, termbox.ColorDefault)
 				} else if cursor_y == n {
 					termbox.SetCell(x, height-4-n, c, termbox.ColorYellow|termbox.AttrUnderline, termbox.ColorDefault)
+				} else {
+					termbox.SetCell(x, height-4-n, c, termbox.ColorDefault, termbox.ColorDefault)
 				}
 			}
 			x += w
@@ -239,7 +241,6 @@ func NewLines(line *client.RepoNotificationCounter) Lines {
 }
 
 func Interface(repoNotificationCounters client.RepoNotificationCounters) (selected []Lines, err error) {
-	// TODO: ここをrepositoryの配列にする
 	data := repoNotificationCounters
 	ctx.lines = make([]Lines, 0)
 	for _, line := range data {

@@ -21,30 +21,42 @@ var (
 	timer              *time.Timer
 )
 
-type Ctx struct {
-	lines    []Lines
-	selected []Lines
-	input    []rune
-	heading  bool
-	mutex    sync.Mutex
-	loop     bool
-	dirty    bool
-	update   bool
-	help     bool
+func printTB(x, y int, fg, bg termbox.Attribute, msg string) {
+	for _, c := range []rune(msg) {
+		termbox.SetCell(x, y, c, fg, bg)
+		x += runewidth.RuneWidth(c)
+	}
 }
 
-var ctx = Ctx{
-	lines:   []Lines{},
-	input:   []rune{},
-	heading: false,
-	mutex:   sync.Mutex{},
-	loop:    true,
-	dirty:   true,
-	update:  false,
-	help:    false,
+func printfTB(x, y int, fg, bg termbox.Attribute, format string, args ...interface{}) {
+	s := fmt.Sprintf(format, args...)
+	printTB(x, y, fg, bg, s)
 }
 
-type Lines struct {
+type RepoCtx struct {
+	repolines []repoLines
+	selected  []repoLines
+	input     []rune
+	heading   bool
+	mutex     sync.Mutex
+	loop      bool
+	dirty     bool
+	update    bool
+	help      bool
+}
+
+var repoCtx = RepoCtx{
+	repolines: []repoLines{},
+	input:     []rune{},
+	heading:   false,
+	mutex:     sync.Mutex{},
+	loop:      true,
+	dirty:     true,
+	update:    false,
+	help:      false,
+}
+
+type repoLines struct {
 	line        *client.RepoNotificationCounter
 	disp        string
 	unreadCount string
@@ -52,38 +64,38 @@ type Lines struct {
 	repo        string
 }
 
-type matched struct {
-	Lines
+type matchedrepo struct {
+	repoLines
 	pos1     int
 	pos2     int
 	selected bool
 }
 
-type filtered []matched
+type filteredRepo []matchedrepo
 
-var current filtered
+var currentRepo filteredRepo
 
-func filterLine() {
-	ctx.mutex.Lock()
-	defer ctx.mutex.Unlock()
+func filterRepoLine() {
+	repoCtx.mutex.Lock()
+	defer repoCtx.mutex.Unlock()
 
 	defer func() {
 		recover()
 	}()
 
-	if len(ctx.input) == 0 {
-		current = make(filtered, len(ctx.lines))
-		for n, f := range ctx.lines {
-			unreadCount, owner, repo, _ := Split(f.line)
+	if len(repoCtx.input) == 0 {
+		currentRepo = make(filteredRepo, len(repoCtx.repolines))
+		for n, f := range repoCtx.repolines {
+			unreadCount, owner, repo, _ := SplitRepo(f.line)
 			prev_selected := false
-			for _, s := range ctx.selected {
+			for _, s := range repoCtx.selected {
 				if f.disp == s.disp {
 					prev_selected = true
 					break
 				}
 			}
-			current[n] = matched{
-				Lines: Lines{
+			currentRepo[n] = matchedrepo{
+				repoLines: repoLines{
 					line:        f.line,
 					disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, repo),
 					unreadCount: unreadCount,
@@ -97,28 +109,28 @@ func filterLine() {
 		}
 	} else {
 		pat := "(?i)(?:.*)("
-		for _, r := range []rune(ctx.input) {
+		for _, r := range []rune(repoCtx.input) {
 			pat += regexp.QuoteMeta(string(r)) + ".*?"
 		}
 		pat += ")"
 		re := regexp.MustCompile(pat)
 
-		current = make(filtered, 0, len(ctx.lines))
-		for _, f := range ctx.lines {
-			unreadCount, owner, repo, _ := Split(f.line)
+		currentRepo = make(filteredRepo, 0, len(repoCtx.repolines))
+		for _, f := range repoCtx.repolines {
+			unreadCount, owner, repo, _ := SplitRepo(f.line)
 			ms := re.FindAllStringSubmatchIndex(f.disp, 1)
 			if len(ms) != 1 || len(ms[0]) != 4 {
 				continue
 			}
 			prev_selected := false
-			for _, s := range ctx.selected {
+			for _, s := range repoCtx.selected {
 				if f.disp == s.disp {
 					prev_selected = true
 					break
 				}
 			}
-			current = append(current, matched{
-				Lines: Lines{
+			currentRepo = append(currentRepo, matchedrepo{
+				repoLines: repoLines{
 					line:        f.line,
 					disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, repo),
 					unreadCount: unreadCount,
@@ -135,14 +147,14 @@ func filterLine() {
 	if cursor_y < 0 {
 		cursor_y = 0
 	}
-	if cursor_y >= len(current) {
-		cursor_y = len(current) - 1
+	if cursor_y >= len(currentRepo) {
+		cursor_y = len(currentRepo) - 1
 	}
 }
 
-func drawScreen() {
-	ctx.mutex.Lock()
-	defer ctx.mutex.Unlock()
+func drawRepoScreen() {
+	repoCtx.mutex.Lock()
+	defer repoCtx.mutex.Unlock()
 
 	defer func() {
 		recover()
@@ -152,24 +164,24 @@ func drawScreen() {
 	termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
 
 	pat := ""
-	for _, r := range ctx.input {
+	for _, r := range repoCtx.input {
 		pat += regexp.QuoteMeta(string(r)) + ".*?"
 	}
 	for n := 0; n < height-3; n++ {
-		if n >= len(current) {
+		if n >= len(currentRepo) {
 			break
 		}
 		x := 2
 		w := 0
-		//line := current[n].line
-		line := current[n].disp
+		//line := currentRepo[n].line
+		line := currentRepo[n].disp
 
-		pos1 := current[n].pos1
-		pos2 := current[n].pos2
-		selected := current[n].selected
+		pos1 := currentRepo[n].pos1
+		pos2 := currentRepo[n].pos2
+		selected := currentRepo[n].selected
 		if pos1 >= 0 {
-			pwidth := runewidth.StringWidth(string([]rune(current[n].disp)[0:pos1]))
-			if !ctx.heading && pwidth > width/2 {
+			pwidth := runewidth.StringWidth(string([]rune(currentRepo[n].disp)[0:pos1]))
+			if !repoCtx.heading && pwidth > width/2 {
 				rline := []rune(line)
 				wwidth := 0
 				for i := 0; i < len(rline); i++ {
@@ -221,30 +233,30 @@ func drawScreen() {
 		printTB(0, height-3, termbox.ColorGreen|termbox.AttrBold, termbox.ColorBlack, string([]rune("-\\|/")[scanning%4]))
 		scanning++
 	}
-	printfTB(2, height-3, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, "%d/%d(%d)", len(current), len(ctx.lines), len(ctx.selected))
+	printfTB(2, height-3, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, "%d/%d(%d)", len(currentRepo), len(repoCtx.repolines), len(repoCtx.selected))
 	printTB(0, height-2, termbox.ColorBlue|termbox.AttrBold, termbox.ColorBlack, "> ")
-	printTB(2, height-2, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, string(ctx.input))
-	termbox.SetCursor(2+runewidth.StringWidth(string(ctx.input[0:cursor_x])), height-2)
+	printTB(2, height-2, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, string(repoCtx.input))
+	termbox.SetCursor(2+runewidth.StringWidth(string(repoCtx.input[0:cursor_x])), height-2)
 	termbox.Flush()
 }
 
-func NewLines(line *client.RepoNotificationCounter) Lines {
-	unreadCount, owner, repo, _ := Split(line)
-	lines := Lines{
+func NewrepoLines(line *client.RepoNotificationCounter) repoLines {
+	unreadCount, owner, repo, _ := SplitRepo(line)
+	repolines := repoLines{
 		line:        line,
 		disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, repo),
 		unreadCount: unreadCount,
 		owner:       owner,
 		repo:        repo,
 	}
-	return lines
+	return repolines
 }
 
-func Interface(repoNotificationCounters client.RepoNotificationCounters) (selected []Lines, err error) {
+func RepoSelectInterface(repoNotificationCounters client.RepoNotificationCounters) (selected []repoLines, err error) {
 	data := repoNotificationCounters
-	ctx.lines = make([]Lines, 0)
+	repoCtx.repolines = make([]repoLines, 0)
 	for _, line := range data {
-		ctx.lines = append(ctx.lines, NewLines(line))
+		repoCtx.repolines = append(repoCtx.repolines, NewrepoLines(line))
 	}
 	err = termbox.Init()
 	if err != nil {
@@ -257,10 +269,10 @@ func Interface(repoNotificationCounters client.RepoNotificationCounters) (select
 
 	// Termbox init
 	termbox.SetInputMode(termbox.InputEsc)
-	refreshScreen(0)
-	mainLoop()
+	refreshRepoScreen(0)
+	repoMainLoop()
 
-	selected = ctx.selected
+	selected = repoCtx.selected
 	if len(selected) == 0 {
 		err = fmt.Errorf("no selected")
 		return
@@ -269,21 +281,21 @@ func Interface(repoNotificationCounters client.RepoNotificationCounters) (select
 	return
 }
 
-func handleKeyEvent(ev termbox.Event) {
+func handleRepoKeyEvent(ev termbox.Event) {
 	defer func() {
 		recover()
 	}()
 
 	switch ev.Key {
 	case termbox.KeyTab:
-		if ctx.help {
-			ctx.help = false
+		if repoCtx.help {
+			repoCtx.help = false
 		} else {
-			ctx.help = true
+			repoCtx.help = true
 		}
 	case termbox.KeyEsc, termbox.KeyCtrlC:
-		if ctx.help {
-			ctx.help = false
+		if repoCtx.help {
+			repoCtx.help = false
 		} else {
 			termbox.Close()
 			os.Exit(1)
@@ -291,24 +303,24 @@ func handleKeyEvent(ev termbox.Event) {
 	case termbox.KeyHome, termbox.KeyCtrlA:
 		cursor_x = 0
 	case termbox.KeyEnd, termbox.KeyCtrlE:
-		cursor_x = len(ctx.input)
+		cursor_x = len(repoCtx.input)
 	case termbox.KeyEnter:
-		if cursor_y >= 0 && cursor_y < len(current) {
-			if len(ctx.selected) == 0 {
-				ctx.selected = append(ctx.selected, current[cursor_y].Lines)
+		if cursor_y >= 0 && cursor_y < len(currentRepo) {
+			if len(repoCtx.selected) == 0 {
+				repoCtx.selected = append(repoCtx.selected, currentRepo[cursor_y].repoLines)
 			}
-			ctx.loop = false
+			repoCtx.loop = false
 		}
 	case termbox.KeyArrowLeft, termbox.KeyCtrlB:
 		if cursor_x > 0 {
 			cursor_x--
 		}
 	case termbox.KeyArrowRight, termbox.KeyCtrlF:
-		if cursor_x < len([]rune(ctx.input)) {
+		if cursor_x < len([]rune(repoCtx.input)) {
 			cursor_x++
 		}
 	case termbox.KeyArrowUp, termbox.KeyCtrlK, termbox.KeyCtrlP:
-		if cursor_y < len(current)-1 {
+		if cursor_y < len(currentRepo)-1 {
 			if cursor_y < height-4 {
 				cursor_y++
 			}
@@ -319,14 +331,14 @@ func handleKeyEvent(ev termbox.Event) {
 		}
 	case termbox.KeyBackspace, termbox.KeyBackspace2:
 		if cursor_x > 0 {
-			ctx.input = append(ctx.input[0:cursor_x-1], ctx.input[cursor_x:len(ctx.input)]...)
+			repoCtx.input = append(repoCtx.input[0:cursor_x-1], repoCtx.input[cursor_x:len(repoCtx.input)]...)
 			cursor_x--
-			ctx.update = true
+			repoCtx.update = true
 		}
 	case termbox.KeyDelete:
-		if cursor_x < len([]rune(ctx.input)) {
-			ctx.input = append(ctx.input[0:cursor_x], ctx.input[cursor_x+1:len(ctx.input)]...)
-			ctx.update = true
+		if cursor_x < len([]rune(repoCtx.input)) {
+			repoCtx.input = append(repoCtx.input[0:cursor_x], repoCtx.input[cursor_x+1:len(repoCtx.input)]...)
+			repoCtx.update = true
 		}
 	default:
 		if ev.Key == termbox.KeySpace {
@@ -334,74 +346,62 @@ func handleKeyEvent(ev termbox.Event) {
 		}
 		if ev.Ch > 0 {
 			out := []rune{}
-			out = append(out, ctx.input[0:cursor_x]...)
+			out = append(out, repoCtx.input[0:cursor_x]...)
 			out = append(out, ev.Ch)
-			ctx.input = append(out, ctx.input[cursor_x:len(ctx.input)]...)
+			repoCtx.input = append(out, repoCtx.input[cursor_x:len(repoCtx.input)]...)
 			cursor_x++
-			ctx.update = true
+			repoCtx.update = true
 		}
 	}
 
 	// If need to update, start timer
 	if scanning != -1 {
-		if ctx.update {
-			ctx.dirty = true
+		if repoCtx.update {
+			repoCtx.dirty = true
 			timer.Reset(duration)
 		} else {
 			timer.Reset(1)
 		}
 	} else {
-		if ctx.update {
-			filterLine()
+		if repoCtx.update {
+			filterRepoLine()
 		} else {
 		}
-		drawScreen()
+		drawRepoScreen()
 	}
 }
 
-func refreshScreen(delay time.Duration) {
+func refreshRepoScreen(delay time.Duration) {
 	if timer == nil {
 		timer = time.AfterFunc(delay, func() {
-			if ctx.dirty {
-				filterLine()
+			if repoCtx.dirty {
+				filterRepoLine()
 			}
-			if ctx.help {
-				ctx.input = []rune{}
+			if repoCtx.help {
+				repoCtx.input = []rune{}
 				termbox.HideCursor()
 			} else {
-				drawScreen()
+				drawRepoScreen()
 			}
-			ctx.dirty = false
+			repoCtx.dirty = false
 		})
 	} else {
 		timer.Reset(delay)
 	}
 }
 
-func mainLoop() {
-	for ctx.loop {
+func repoMainLoop() {
+	for repoCtx.loop {
 		ev := termbox.PollEvent()
 		if ev.Type == termbox.EventError {
-			ctx.update = false
+			repoCtx.update = false
 		} else if ev.Type == termbox.EventKey {
-			handleKeyEvent(ev)
+			handleRepoKeyEvent(ev)
 		}
 	}
 }
 
-func printTB(x, y int, fg, bg termbox.Attribute, msg string) {
-	for _, c := range []rune(msg) {
-		termbox.SetCell(x, y, c, fg, bg)
-		x += runewidth.RuneWidth(c)
-	}
-}
-
-func printfTB(x, y int, fg, bg termbox.Attribute, format string, args ...interface{}) {
-	s := fmt.Sprintf(format, args...)
-	printTB(x, y, fg, bg, s)
-}
-
-func Split(counter *client.RepoNotificationCounter) (unreadCount, owner, repo string, err error) {
+func SplitRepo(counter *client.RepoNotificationCounter) (unreadCount, owner, repo string, err error) {
 	unreadCount = strconv.Itoa(counter.UnreadNotificationCount)
 	owner = *counter.Repository.Owner.Login
 	repo = *counter.Repository.Name

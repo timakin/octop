@@ -14,8 +14,8 @@ import (
 func CmdInit(c *cli.Context) {
 	i := client.New()
 	repoNotificationCounters := i.GetRepoNotificationCounters()
-	repl.Interface(repoNotificationCounters)
-	selected, err := repl.Interface(repoNotificationCounters)
+
+	selected, err := repl.RepoSelectInterface(repoNotificationCounters)
 	if err != nil {
 		log.Fatal(err)
 	}

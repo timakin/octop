@@ -12,7 +12,7 @@ var GlobalFlags = []cli.Flag{}
 
 var Commands = []cli.Command{
 	{
-		Name:   "notification",
+		Name:   "n",
 		Usage:  "",
 		Action: command.CmdNotification,
 		Flags:  []cli.Flag{},
@@ -24,13 +24,13 @@ var Commands = []cli.Command{
 		Flags:  []cli.Flag{},
 	},
 	{
-		Name:   "issue",
+		Name:   "i",
 		Usage:  "",
 		Action: command.CmdIssue,
 		Flags:  []cli.Flag{},
 	},
 	{
-		Name:   "pr",
+		Name:   "p",
 		Usage:  "",
 		Action: command.CmdPr,
 		Flags:  []cli.Flag{},

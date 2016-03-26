@@ -34,4 +34,10 @@ type RepoNotificationCounter struct {
 	UnreadNotificationCount int
 }
 
+type ResponseContent struct {
+	Title string
+	Body  string
+}
+
 type RepoNotificationCounters []*RepoNotificationCounter
+type ResponseContents []*ResponseContent

@@ -23,7 +23,7 @@ func (i Instance) GetNotifications() []github.Notification {
 }
 
 func (i Instance) GetIssues() []github.IssueEvent {
-	opt := &github.ListOptions{PerPage: 10}
+	opt := &github.ListOptions{PerPage: 100}
 	issueEvents, _, err := i.ghCli.Issues.ListRepositoryEvents("rails", "rails", opt)
 	if err != nil {
 		log.Fatal(err)

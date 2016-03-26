@@ -26,6 +26,16 @@ func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {
 	return vsf
 }
 
+func IssueEventFilter(vs []github.IssueEvent, f func(github.IssueEvent) bool) []github.IssueEvent {
+	vsf := make([]github.IssueEvent, 0)
+	for _, v := range vs {
+		if f(v) {
+			vsf = append(vsf, v)
+		}
+	}
+	return vsf
+}
+
 func NotificationFilter(vs []github.Notification, f func(github.Notification) bool) []github.Notification {
 	vsf := make([]github.Notification, 0)
 	for _, v := range vs {

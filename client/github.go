@@ -22,13 +22,13 @@ func (i Instance) GetNotifications() []github.Notification {
 	return notifications
 }
 
-func (i Instance) GetIssues() []github.IssueEvent {
-	opt := &github.ListOptions{PerPage: 100}
-	issueEvents, _, err := i.ghCli.Issues.ListRepositoryEvents("rails", "rails", opt)
+func (i Instance) GetIssues() []github.Issue {
+	opt := &github.IssueListByRepoOptions{State: "open"}
+	issues, _, err := i.ghCli.Issues.ListByRepo("rails", "rails", opt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return issueEvents
+	return issues
 }
 
 func (i Instance) GetPullRequests() []github.Event {

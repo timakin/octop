@@ -36,11 +36,11 @@ var resCtx = ResCtx{
 }
 
 type resLines struct {
-	line        *client.ResponseContent
-	disp        string
-	unreadCount string
-	owner       string
-	res         string
+	line  *client.ResponseContent
+	disp  string
+	owner string
+	title string
+	body  string
 }
 
 type matchedres struct {
@@ -65,7 +65,7 @@ func filterResLine() {
 	if len(resCtx.input) == 0 {
 		currentRes = make(filteredRes, len(resCtx.reslines))
 		for n, f := range resCtx.reslines {
-			unreadCount, owner, res, _ := SplitRes(f.line)
+			owner, title, body, _ := SplitRes(f.line)
 			prev_selected := false
 			for _, s := range resCtx.selected {
 				if f.disp == s.disp {
@@ -75,11 +75,11 @@ func filterResLine() {
 			}
 			currentRes[n] = matchedres{
 				resLines: resLines{
-					line:        f.line,
-					disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, res),
-					unreadCount: unreadCount,
-					owner:       owner,
-					res:         res,
+					line:  f.line,
+					disp:  fmt.Sprintf("%s %s", owner, title),
+					owner: owner,
+					title: title,
+					body:  body,
 				},
 				pos1:     -1,
 				pos2:     -1,
@@ -96,7 +96,7 @@ func filterResLine() {
 
 		currentRes = make(filteredRes, 0, len(resCtx.reslines))
 		for _, f := range resCtx.reslines {
-			unreadCount, owner, res, _ := SplitRes(f.line)
+			owner, title, body, _ := SplitRes(f.line)
 			ms := re.FindAllStringSubmatchIndex(f.disp, 1)
 			if len(ms) != 1 || len(ms[0]) != 4 {
 				continue
@@ -110,11 +110,11 @@ func filterResLine() {
 			}
 			currentRes = append(currentRes, matchedres{
 				resLines: resLines{
-					line:        f.line,
-					disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, res),
-					unreadCount: unreadCount,
-					owner:       owner,
-					res:         res,
+					line:  f.line,
+					disp:  fmt.Sprintf("%s %s", owner, title),
+					owner: owner,
+					title: title,
+					body:  body,
 				},
 				pos1:     len([]rune(f.disp[0:ms[0][2]])),
 				pos2:     len([]rune(f.disp[0:ms[0][3]])),
@@ -220,13 +220,13 @@ func drawResScreen() {
 }
 
 func NewresLines(line *client.ResponseContent) resLines {
-	unreadCount, owner, res, _ := SplitRes(line)
+	owner, title, body, _ := SplitRes(line)
 	reslines := resLines{
-		line:        line,
-		disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, res),
-		unreadCount: unreadCount,
-		owner:       owner,
-		res:         res,
+		line:  line,
+		disp:  fmt.Sprintf("%s %s", owner, title),
+		owner: owner,
+		title: title,
+		body:  body,
 	}
 	return reslines
 }

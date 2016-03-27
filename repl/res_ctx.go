@@ -13,8 +13,8 @@ import (
 )
 
 type ResCtx struct {
-	reslines []resLines
-	selected []resLines
+	Reslines []ResLines
+	selected []ResLines
 	input    []rune
 	heading  bool
 	mutex    sync.Mutex
@@ -25,7 +25,7 @@ type ResCtx struct {
 }
 
 var resCtx = ResCtx{
-	reslines: []resLines{},
+	Reslines: []ResLines{},
 	input:    []rune{},
 	heading:  false,
 	mutex:    sync.Mutex{},
@@ -35,16 +35,16 @@ var resCtx = ResCtx{
 	help:     false,
 }
 
-type resLines struct {
+type ResLines struct {
 	line  *client.ResponseContent
 	disp  string
-	owner string
-	title string
-	body  string
+	Owner string
+	Title string
+	Body  string
 }
 
 type matchedres struct {
-	resLines
+	ResLines
 	pos1     int
 	pos2     int
 	selected bool
@@ -63,9 +63,9 @@ func filterResLine() {
 	}()
 
 	if len(resCtx.input) == 0 {
-		currentRes = make(filteredRes, len(resCtx.reslines))
-		for n, f := range resCtx.reslines {
-			owner, title, body, _ := SplitRes(f.line)
+		currentRes = make(filteredRes, len(resCtx.Reslines))
+		for n, f := range resCtx.Reslines {
+			Owner, Title, Body, _ := SplitRes(f.line)
 			prev_selected := false
 			for _, s := range resCtx.selected {
 				if f.disp == s.disp {
@@ -74,12 +74,12 @@ func filterResLine() {
 				}
 			}
 			currentRes[n] = matchedres{
-				resLines: resLines{
+				ResLines: ResLines{
 					line:  f.line,
-					disp:  fmt.Sprintf("%s %s", owner, title),
-					owner: owner,
-					title: title,
-					body:  body,
+					disp:  fmt.Sprintf("%s %s", Owner, Title),
+					Owner: Owner,
+					Title: Title,
+					Body:  Body,
 				},
 				pos1:     -1,
 				pos2:     -1,
@@ -94,9 +94,9 @@ func filterResLine() {
 		pat += ")"
 		re := regexp.MustCompile(pat)
 
-		currentRes = make(filteredRes, 0, len(resCtx.reslines))
-		for _, f := range resCtx.reslines {
-			owner, title, body, _ := SplitRes(f.line)
+		currentRes = make(filteredRes, 0, len(resCtx.Reslines))
+		for _, f := range resCtx.Reslines {
+			Owner, Title, Body, _ := SplitRes(f.line)
 			ms := re.FindAllStringSubmatchIndex(f.disp, 1)
 			if len(ms) != 1 || len(ms[0]) != 4 {
 				continue
@@ -109,12 +109,12 @@ func filterResLine() {
 				}
 			}
 			currentRes = append(currentRes, matchedres{
-				resLines: resLines{
+				ResLines: ResLines{
 					line:  f.line,
-					disp:  fmt.Sprintf("%s %s", owner, title),
-					owner: owner,
-					title: title,
-					body:  body,
+					disp:  fmt.Sprintf("%s %s", Owner, Title),
+					Owner: Owner,
+					Title: Title,
+					Body:  Body,
 				},
 				pos1:     len([]rune(f.disp[0:ms[0][2]])),
 				pos2:     len([]rune(f.disp[0:ms[0][3]])),
@@ -212,30 +212,30 @@ func drawResScreen() {
 		printTB(0, height-3, termbox.ColorGreen|termbox.AttrBold, termbox.ColorBlack, string([]rune("-\\|/")[scanning%4]))
 		scanning++
 	}
-	printfTB(2, height-3, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, "%d/%d(%d)", len(currentRes), len(resCtx.reslines), len(resCtx.selected))
+	printfTB(2, height-3, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, "%d/%d(%d)", len(currentRes), len(resCtx.Reslines), len(resCtx.selected))
 	printTB(0, height-2, termbox.ColorBlue|termbox.AttrBold, termbox.ColorBlack, "> ")
 	printTB(2, height-2, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, string(resCtx.input))
 	termbox.SetCursor(2+runewidth.StringWidth(string(resCtx.input[0:cursor_x])), height-2)
 	termbox.Flush()
 }
 
-func NewresLines(line *client.ResponseContent) resLines {
-	owner, title, body, _ := SplitRes(line)
-	reslines := resLines{
+func NewResLines(line *client.ResponseContent) ResLines {
+	Owner, Title, Body, _ := SplitRes(line)
+	Reslines := ResLines{
 		line:  line,
-		disp:  fmt.Sprintf("%s %s", owner, title),
-		owner: owner,
-		title: title,
-		body:  body,
+		disp:  fmt.Sprintf("%s %s", Owner, Title),
+		Owner: Owner,
+		Title: Title,
+		Body:  Body,
 	}
-	return reslines
+	return Reslines
 }
 
-func ResSelectInterface(responseContents client.ResponseContents) (selected []resLines, err error) {
+func ResSelectInterface(responseContents client.ResponseContents) (selected []ResLines, err error) {
 	data := responseContents
-	resCtx.reslines = make([]resLines, 0)
+	resCtx.Reslines = make([]ResLines, 0)
 	for _, line := range data {
-		resCtx.reslines = append(resCtx.reslines, NewresLines(line))
+		resCtx.Reslines = append(resCtx.Reslines, NewResLines(line))
 	}
 	err = termbox.Init()
 	if err != nil {
@@ -286,7 +286,7 @@ func handleResKeyEvent(ev termbox.Event) {
 	case termbox.KeyEnter:
 		if cursor_y >= 0 && cursor_y < len(currentRes) {
 			if len(resCtx.selected) == 0 {
-				resCtx.selected = append(resCtx.selected, currentRes[cursor_y].resLines)
+				resCtx.selected = append(resCtx.selected, currentRes[cursor_y].ResLines)
 			}
 			resCtx.loop = false
 		}
@@ -380,8 +380,8 @@ func resMainLoop() {
 	}
 }
 
-func SplitRes(content *client.ResponseContent) (title, owner, res string, err error) {
-	title = content.Title
+func SplitRes(content *client.ResponseContent) (Title, Owner, res string, err error) {
+	Title = content.Title
 	err = nil
 	return
 }

@@ -35,10 +35,9 @@ type RepoNotificationCounter struct {
 }
 
 type ResponseContent struct {
-	Title        string
-	Body         string
-	User         string
-	CreatedAtFmt string
+	Title string
+	Body  string
+	Owner string
 }
 
 type RepoNotificationCounters []*RepoNotificationCounter

@@ -12,14 +12,7 @@ func CmdIssue(c *cli.Context) {
 	instance := client.New()
 	issues := instance.GetIssues("rails", "rails")
 	for _, issue := range issues {
-		fmt.Print(*issue.Title)
-		fmt.Print("\n")
-		fmt.Print("\n")
-		fmt.Print(*issue.Body)
-		fmt.Print("\n")
-		fmt.Print("\n")
-		fmt.Print(*issue.UpdatedAt)
-		fmt.Print("\n")
+		fmt.Print(issue)
 		fmt.Print("\n")
 		fmt.Print("==========================")
 	}

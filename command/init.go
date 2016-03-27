@@ -3,7 +3,6 @@ package command
 import (
 	"fmt"
 	"log"
-	"reflect"
 
 	"github.com/timakin/op/client"
 	"github.com/timakin/op/repl"
@@ -11,11 +10,6 @@ import (
 	"github.com/codegangsta/cli"
 	//"github.com/fatih/color"
 )
-
-type Tesss struct {
-	name string
-	yoyo string
-}
 
 func CmdInit(c *cli.Context) {
 	i := client.New()
@@ -26,8 +20,7 @@ func CmdInit(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	fmt.Println(selected[0])
-	fmt.Println(reflect.TypeOf(selected[0]))
-	//issues := i.GetIssues(selected[0].Title,  selected[0].)
-
+	issues := i.GetIssues(selected[0].Owner, selected[0].Repo)
+	selectedRes, err := repl.ResSelectInterface(issues)
+	fmt.Println(selectedRes)
 }

@@ -34,8 +34,8 @@ func printfTB(x, y int, fg, bg termbox.Attribute, format string, args ...interfa
 }
 
 type RepoCtx struct {
-	repolines []repoLines
-	selected  []repoLines
+	Repolines []RepoLines
+	selected  []RepoLines
 	input     []rune
 	heading   bool
 	mutex     sync.Mutex
@@ -46,7 +46,7 @@ type RepoCtx struct {
 }
 
 var repoCtx = RepoCtx{
-	repolines: []repoLines{},
+	Repolines: []RepoLines{},
 	input:     []rune{},
 	heading:   false,
 	mutex:     sync.Mutex{},
@@ -56,16 +56,16 @@ var repoCtx = RepoCtx{
 	help:      false,
 }
 
-type repoLines struct {
+type RepoLines struct {
 	line        *client.RepoNotificationCounter
 	disp        string
-	unreadCount string
-	owner       string
-	repo        string
+	UnreadCount string
+	Owner       string
+	Repo        string
 }
 
 type matchedrepo struct {
-	repoLines
+	RepoLines
 	pos1     int
 	pos2     int
 	selected bool
@@ -84,9 +84,9 @@ func filterRepoLine() {
 	}()
 
 	if len(repoCtx.input) == 0 {
-		currentRepo = make(filteredRepo, len(repoCtx.repolines))
-		for n, f := range repoCtx.repolines {
-			unreadCount, owner, repo, _ := SplitRepo(f.line)
+		currentRepo = make(filteredRepo, len(repoCtx.Repolines))
+		for n, f := range repoCtx.Repolines {
+			UnreadCount, Owner, Repo, _ := SplitRepo(f.line)
 			prev_selected := false
 			for _, s := range repoCtx.selected {
 				if f.disp == s.disp {
@@ -95,12 +95,12 @@ func filterRepoLine() {
 				}
 			}
 			currentRepo[n] = matchedrepo{
-				repoLines: repoLines{
+				RepoLines: RepoLines{
 					line:        f.line,
-					disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, repo),
-					unreadCount: unreadCount,
-					owner:       owner,
-					repo:        repo,
+					disp:        fmt.Sprintf("%s %s %s", UnreadCount, Owner, Repo),
+					UnreadCount: UnreadCount,
+					Owner:       Owner,
+					Repo:        Repo,
 				},
 				pos1:     -1,
 				pos2:     -1,
@@ -115,9 +115,9 @@ func filterRepoLine() {
 		pat += ")"
 		re := regexp.MustCompile(pat)
 
-		currentRepo = make(filteredRepo, 0, len(repoCtx.repolines))
-		for _, f := range repoCtx.repolines {
-			unreadCount, owner, repo, _ := SplitRepo(f.line)
+		currentRepo = make(filteredRepo, 0, len(repoCtx.Repolines))
+		for _, f := range repoCtx.Repolines {
+			UnreadCount, Owner, Repo, _ := SplitRepo(f.line)
 			ms := re.FindAllStringSubmatchIndex(f.disp, 1)
 			if len(ms) != 1 || len(ms[0]) != 4 {
 				continue
@@ -130,12 +130,12 @@ func filterRepoLine() {
 				}
 			}
 			currentRepo = append(currentRepo, matchedrepo{
-				repoLines: repoLines{
+				RepoLines: RepoLines{
 					line:        f.line,
-					disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, repo),
-					unreadCount: unreadCount,
-					owner:       owner,
-					repo:        repo,
+					disp:        fmt.Sprintf("%s %s %s", UnreadCount, Owner, Repo),
+					UnreadCount: UnreadCount,
+					Owner:       Owner,
+					Repo:        Repo,
 				},
 				pos1:     len([]rune(f.disp[0:ms[0][2]])),
 				pos2:     len([]rune(f.disp[0:ms[0][3]])),
@@ -233,30 +233,30 @@ func drawRepoScreen() {
 		printTB(0, height-3, termbox.ColorGreen|termbox.AttrBold, termbox.ColorBlack, string([]rune("-\\|/")[scanning%4]))
 		scanning++
 	}
-	printfTB(2, height-3, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, "%d/%d(%d)", len(currentRepo), len(repoCtx.repolines), len(repoCtx.selected))
+	printfTB(2, height-3, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, "%d/%d(%d)", len(currentRepo), len(repoCtx.Repolines), len(repoCtx.selected))
 	printTB(0, height-2, termbox.ColorBlue|termbox.AttrBold, termbox.ColorBlack, "> ")
 	printTB(2, height-2, termbox.ColorWhite|termbox.AttrBold, termbox.ColorBlack, string(repoCtx.input))
 	termbox.SetCursor(2+runewidth.StringWidth(string(repoCtx.input[0:cursor_x])), height-2)
 	termbox.Flush()
 }
 
-func NewrepoLines(line *client.RepoNotificationCounter) repoLines {
-	unreadCount, owner, repo, _ := SplitRepo(line)
-	repolines := repoLines{
+func NewRepoLines(line *client.RepoNotificationCounter) RepoLines {
+	UnreadCount, Owner, Repo, _ := SplitRepo(line)
+	Repolines := RepoLines{
 		line:        line,
-		disp:        fmt.Sprintf("%s %s %s", unreadCount, owner, repo),
-		unreadCount: unreadCount,
-		owner:       owner,
-		repo:        repo,
+		disp:        fmt.Sprintf("%s %s %s", UnreadCount, Owner, Repo),
+		UnreadCount: UnreadCount,
+		Owner:       Owner,
+		Repo:        Repo,
 	}
-	return repolines
+	return Repolines
 }
 
-func RepoSelectInterface(repoNotificationCounters client.RepoNotificationCounters) (selected []repoLines, err error) {
+func RepoSelectInterface(repoNotificationCounters client.RepoNotificationCounters) (selected []RepoLines, err error) {
 	data := repoNotificationCounters
-	repoCtx.repolines = make([]repoLines, 0)
+	repoCtx.Repolines = make([]RepoLines, 0)
 	for _, line := range data {
-		repoCtx.repolines = append(repoCtx.repolines, NewrepoLines(line))
+		repoCtx.Repolines = append(repoCtx.Repolines, NewRepoLines(line))
 	}
 	err = termbox.Init()
 	if err != nil {
@@ -307,7 +307,7 @@ func handleRepoKeyEvent(ev termbox.Event) {
 	case termbox.KeyEnter:
 		if cursor_y >= 0 && cursor_y < len(currentRepo) {
 			if len(repoCtx.selected) == 0 {
-				repoCtx.selected = append(repoCtx.selected, currentRepo[cursor_y].repoLines)
+				repoCtx.selected = append(repoCtx.selected, currentRepo[cursor_y].RepoLines)
 			}
 			repoCtx.loop = false
 		}
@@ -401,9 +401,9 @@ func repoMainLoop() {
 	}
 }
 
-func SplitRepo(counter *client.RepoNotificationCounter) (unreadCount, owner, repo string, err error) {
-	unreadCount = strconv.Itoa(counter.UnreadNotificationCount)
-	owner = *counter.Repository.Owner.Login
+func SplitRepo(counter *client.RepoNotificationCounter) (UnreadCount, Owner, repo string, err error) {
+	UnreadCount = strconv.Itoa(counter.UnreadNotificationCount)
+	Owner = *counter.Repository.Owner.Login
 	repo = *counter.Repository.Name
 	err = nil
 	return

@@ -22,13 +22,27 @@ func (i Instance) GetNotifications() []github.Notification {
 	return notifications
 }
 
-func (i Instance) GetIssues(owner string, repo string) []github.Issue {
+func (i Instance) GetIssues(owner string, repo string) ResponseContents {
 	opt := &github.IssueListByRepoOptions{State: "open"}
 	issues, _, err := i.ghCli.Issues.ListByRepo(owner, repo, opt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return issues
+
+	return i.convertIssuesToResContents(issues)
+}
+
+func (i Instance) convertIssuesToResContents(issues []github.Issue) ResponseContents {
+	var res ResponseContents
+	for _, issue := range issues {
+		issue := issue
+		res = append(res, &ResponseContent{
+			Title: *issue.Title,
+			Owner: *issue.User.Login,
+			Body:  *issue.Body,
+		})
+	}
+	return res
 }
 
 func (i Instance) GetPullRequests(owner string, repo string) []github.PullRequest {

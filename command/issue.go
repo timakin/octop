@@ -10,7 +10,7 @@ import (
 
 func CmdIssue(c *cli.Context) {
 	instance := client.New()
-	issues := instance.GetIssues()
+	issues := instance.GetIssues("rails", "rails")
 	for _, issue := range issues {
 		fmt.Print(*issue.Title)
 		fmt.Print("\n")

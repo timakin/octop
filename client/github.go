@@ -22,9 +22,9 @@ func (i Instance) GetNotifications() []github.Notification {
 	return notifications
 }
 
-func (i Instance) GetIssues() []github.Issue {
+func (i Instance) GetIssues(owner string, repo string) []github.Issue {
 	opt := &github.IssueListByRepoOptions{State: "open"}
-	issues, _, err := i.ghCli.Issues.ListByRepo("rails", "rails", opt)
+	issues, _, err := i.ghCli.Issues.ListByRepo(owner, repo, opt)
 	if err != nil {
 		log.Fatal(err)
 	}

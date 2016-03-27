@@ -25,8 +25,11 @@ func CmdPr(c *cli.Context) {
 	instance := client.New()
 	pullreqs := instance.GetPullRequests("rails", "rails")
 	for _, pullreq := range pullreqs {
-		fmt.Print(*pullreq.PullRequest.Title)
+		fmt.Print(*pullreq.Title)
 		fmt.Print("\n")
+		fmt.Print(*pullreq.State)
+		fmt.Print("\n")
+		fmt.Print(*pullreq.Body)
 		fmt.Print("\n")
 	}
 }

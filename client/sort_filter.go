@@ -36,8 +36,8 @@ func IssueEventFilter(vs []github.IssueEvent, f func(github.IssueEvent) bool) []
 	return vsf
 }
 
-func PullReqFilter(vs []github.PullRequestEvent, f func(github.PullRequestEvent) bool) []github.PullRequestEvent {
-	vsf := make([]github.PullRequestEvent, 0)
+func PullReqFilter(vs []github.PullRequest, f func(github.PullRequest) bool) []github.PullRequest {
+	vsf := make([]github.PullRequest, 0)
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)

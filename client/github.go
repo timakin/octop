@@ -1,6 +1,7 @@
 package client
 
 import (
+	"encoding/json"
 	"log"
 	"sort"
 
@@ -31,14 +32,27 @@ func (i Instance) GetIssues(owner string, repo string) []github.Issue {
 	return issues
 }
 
-func (i Instance) GetPullRequests() []github.Event {
+func (i Instance) GetPullRequests(owner string, repo string) []*github.PullRequestEvent {
 	opt := &github.ListOptions{PerPage: 100}
-	events, _, err := i.ghCli.Activity.ListRepositoryEvents("rails", "rails", opt)
+	events, _, err := i.ghCli.Activity.ListRepositoryEvents(owner, repo, opt)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pullreqs := EventFilter(events, func(e github.Event) bool {
-		return *e.Type == "PullRequestEvent"
+
+	var pullRequestEvents []*github.PullRequestEvent
+	for i, event := range events {
+		var pullreqPayload *github.PullRequestEvent
+		err := json.Unmarshal(*event.RawPayload, &pullreqPayload)
+		if err != nil {
+			panic(err)
+		}
+		pullRequestEvents[i] = pullreqPayload
+	}
+
+	pullreqs := PullReqFilter(events, func(e github.PullRequestEvent) bool {
+		isOpen := *e.PullRequest.State == "open"
+		isValidType := *e.Type == "PullRequestEvent"
+		return isOpen && isValidType
 	})
 	return pullreqs
 }

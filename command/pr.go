@@ -7,7 +7,6 @@ import (
 	"fmt"
 
 	"github.com/codegangsta/cli"
-	"github.com/google/go-github/github"
 )
 
 func MapToStruct(m map[string]interface{}, val interface{}) error {
@@ -24,26 +23,10 @@ func MapToStruct(m map[string]interface{}, val interface{}) error {
 
 func CmdPr(c *cli.Context) {
 	instance := client.New()
-	pullreqs := instance.GetPullRequests()
+	pullreqs := instance.GetPullRequests("rails", "rails")
 	for _, pullreq := range pullreqs {
-		var pullreqPayload github.PullRequestEvent
-
-		//		switch v := pullreq.Payload().(type) {
-		//		case github.PullRequestEvent:
-		//			fmt.Println(*v.PullRequest.Title)
-		//		default:
-		//			fmt.Println(v)
-		//			fmt.Println("invalid payload!")
-		//		}
-		//fmt.Print(pullreq.Payload().(github.PullRequestEvent).PullRequest.Title)
-		err := json.Unmarshal(*pullreq.RawPayload, &pullreqPayload)
-		if err != nil {
-			panic(err)
-		}
-		if *pullreqPayload.PullRequest.State == "open" {
-			fmt.Print(*pullreqPayload.PullRequest.Title)
-			fmt.Print("\n")
-			fmt.Print("\n")
-		}
+		fmt.Print(*pullreq.PullRequest.Title)
+		fmt.Print("\n")
+		fmt.Print("\n")
 	}
 }

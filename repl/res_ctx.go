@@ -380,8 +380,10 @@ func resMainLoop() {
 	}
 }
 
-func SplitRes(content *client.ResponseContent) (Title, Owner, res string, err error) {
+func SplitRes(content *client.ResponseContent) (Title, Owner, Body string, err error) {
 	Title = content.Title
+	Owner = content.Owner
+	Body = content.Body
 	err = nil
 	return
 }

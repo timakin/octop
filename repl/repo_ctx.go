@@ -10,7 +10,7 @@ import (
 
 	"github.com/mattn/go-runewidth"
 	"github.com/nsf/termbox-go"
-	"github.com/timakin/op/client"
+	"github.com/timakin/octop/client"
 )
 
 var (

@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/timakin/op/client"
+	"github.com/timakin/octop/client"
 
 	"fmt"
 

@@ -117,7 +117,7 @@ octop explore
 
 ## Contribution
 
-1. Fork ([https://github.com/timakin/op/fork](https://github.com/timakin/op/fork))
+1. Fork ([https://github.com/timakin/octop/fork](https://github.com/timakin/octop/fork))
 1. Create a feature branch
 1. Commit your changes
 1. Rebase your local changes against the master branch

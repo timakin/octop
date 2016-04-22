@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/timakin/op/client"
-	"github.com/timakin/op/repl"
+	"github.com/timakin/octop/client"
+	"github.com/timakin/octop/repl"
 
 	"github.com/codegangsta/cli"
 	//"github.com/fatih/color"

@@ -1,4 +1,4 @@
-OctoPatrol (op command)
+OctoPatrol (octop command)
 ========
 
 OctoPatrol is the command line tool for watching notifications from repositories you watch.
@@ -21,13 +21,13 @@ And wished to finish off all tasks on terminal display as I could.
 
 ## Installation
 ```bash
-$ go get -d github.com/timakin/op
+$ go get -d github.com/timakin/octop
 ```
 
 After installed binary packed octopatrol command, authenticate your account for repository tracking.
 
 ```
-op init
+octop init
 > Token: ***************************************
 > Authentication Verified!
 ```
@@ -37,7 +37,7 @@ https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 
 ## Notification tracking
 ```
-op [ -r repo_selection_flag ]
+octop [ -r repo_selection_flag ]
 > list all repositories that you are watching.
 > And decided the repo, display events.
 
@@ -53,7 +53,7 @@ Type       | name |   created_at   |
 ```
 
 ```
-op issue [ -r repo_selection_flag ] [-p participating]
+octop issue [ -r repo_selection_flag ] [-p participating]
 
 > list all repos you fallow, and select repository seeing names.
 > and show 10 latest issues.
@@ -68,7 +68,7 @@ Type       | name |   created_at   |
 ```
 
 ```
-op pr [ -r repo_selection_flag ]
+octop pr [ -r repo_selection_flag ]
 
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 Type       | name |   created_at   |
@@ -81,7 +81,7 @@ Type       | name |   created_at   |
 ```
 
 ```
-op explore
+octop explore
 
 > hot topics in all github news streams.
 ```

@@ -1,4 +1,4 @@
 package main
 
-const Name string = "op"
+const Name string = "octop"
 const Version string = "0.1.0"

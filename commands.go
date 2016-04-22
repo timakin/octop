@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/codegangsta/cli"
-	"github.com/timakin/op/command"
+	"github.com/timakin/octop/command"
 )
 
 var GlobalFlags = []cli.Flag{}

@@ -3,27 +3,25 @@ package command
 import (
 	"github.com/timakin/octop/client"
 
-	"encoding/json"
 	"fmt"
+	"log"
 
 	"github.com/codegangsta/cli"
+	"github.com/fatih/color"
+	"github.com/timakin/octop/repl"
 )
 
-func MapToStruct(m map[string]interface{}, val interface{}) error {
-	tmp, err := json.Marshal(m)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(tmp, val)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func CmdPr(c *cli.Context) {
-	instance := client.New()
-	pullreqs := instance.GetPullRequests("rails", "rails")
+	i := client.New()
+	repoNotificationCounters := i.GetRepoNotificationCounters()
+
+	selected, err := repl.RepoSelectInterface(repoNotificationCounters)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pullreqs := i.GetPullRequests(selected[0].Owner, selected[0].Repo)
+
 	for _, pullreq := range pullreqs {
 		fmt.Print(*pullreq.Title)
 		fmt.Print("\n")
@@ -31,5 +29,6 @@ func CmdPr(c *cli.Context) {
 		fmt.Print("\n")
 		fmt.Print(*pullreq.Body)
 		fmt.Print("\n")
+		color.Cyan("----------------------------------------\n")
 	}
 }

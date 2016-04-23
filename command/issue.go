@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"github.com/codegangsta/cli"
+	"github.com/fatih/color"
 	"github.com/timakin/octop/repl"
 )
 
@@ -26,6 +27,6 @@ func CmdIssue(c *cli.Context) {
 		fmt.Print("\n")
 		fmt.Print(issue.URL)
 		fmt.Print("\n")
-		fmt.Print("==========================\n")
+		color.Cyan("---------------------------------------\n")
 	}
 }

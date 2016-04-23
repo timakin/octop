@@ -18,12 +18,6 @@ var Commands = []cli.Command{
 		Flags:  []cli.Flag{},
 	},
 	{
-		Name:   "init",
-		Usage:  "",
-		Action: command.CmdInit,
-		Flags:  []cli.Flag{},
-	},
-	{
 		Name:   "i",
 		Usage:  "",
 		Action: command.CmdIssue,

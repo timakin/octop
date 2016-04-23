@@ -26,62 +26,17 @@ $ go get -d github.com/timakin/octop
 
 After installed binary packed octopatrol command, authenticate your account for repository tracking.
 
-```
-octop init
-> Token: ***************************************
-> Authentication Verified!
-```
-
 _Get your access token following this post._
 https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 
 ## Notification tracking
 ```
-octop [ -r repo_selection_flag ]
-> list all repositories that you are watching.
-> And decided the repo, display events.
-
-[ Repo ] open_issues_count: xxx
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-Type       | name |   created_at   |
-
-[Issue]    | .... | 2016-01-03-xxx |
-[Issue]    | .... | 2016-01-02-xxx |
-[Issue]    | .... | 2016-01-01-xxx |
-[Pull-req] | .... | 2015-12-31-xxx |
-[Pull-req] | .... | 2015-12-30-xxx |
-```
+octop n - notification tracking
+octop i - issue tracking, with an interactive selection of repo
+octop p - pull-reqs tracking, with an interactive selection of repo
+``
 
 ```
-octop issue [ -r repo_selection_flag ] [-p participating]
-
-> list all repos you fallow, and select repository seeing names.
-> and show 10 latest issues.
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-Type       | name |   created_at   |
-
-[Issue]    | .... | 2016-01-03-xxx |
-[Issue]    | .... | 2016-01-02-xxx |
-[Issue]    | .... | 2016-01-01-xxx |
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-```
-
-```
-octop pr [ -r repo_selection_flag ]
-
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-Type       | name |   created_at   |
-
-[Pull-req] | .... | 2015-12-31-xxx |
-[Pull-req] | .... | 2015-12-30-xxx |
-[Pull-req] | .... | 2015-12-29-xxx |
-[Pull-req] | .... | 2015-12-28-xxx |
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-```
-
-```
-octop explore
 
 > hot topics in all github news streams.
 ```
@@ -106,14 +61,6 @@ octop explore
   - [issue-events](https://developer.github.com/v3/issues/events/)
 - Use Cases
  - [Qiita](http://qiita.com/awakia/items/bd4cdfab2b552e2151ad)
-
-## TODO
-
-- [ ] select repos with order by notification count
-- [ ] peco integration and get result of selection
-- [ ] get list of unread pull requests, notificaitons, issues
-- [ ] stylish with ANSI color
-- [ ] list and check body of notification, and if touched, send PUT request to notify reading
 
 ## Contribution
 

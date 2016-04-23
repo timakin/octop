@@ -23,12 +23,8 @@ func CmdPr(c *cli.Context) {
 	pullreqs := i.GetPullRequests(selected[0].Owner, selected[0].Repo)
 
 	for _, pullreq := range pullreqs {
-		fmt.Print(*pullreq.Title)
-		fmt.Print("\n")
-		fmt.Print(*pullreq.State)
-		fmt.Print("\n")
-		fmt.Print(*pullreq.Body)
-		fmt.Print("\n")
-		color.Cyan("----------------------------------------\n")
+		color.Cyan(*pullreq.Title)
+		fmt.Print(*pullreq.HTMLURL + "\n")
+		color.Cyan("----------------------------------------")
 	}
 }

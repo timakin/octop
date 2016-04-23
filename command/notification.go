@@ -13,10 +13,8 @@ func CmdNotification(c *cli.Context) {
 	i := client.New()
 	notifications := i.GetNotifications()
 	for _, notification := range notifications {
-		fmt.Print(*notification.Subject.Title)
-		fmt.Print("\n")
-		fmt.Print(*notification.Subject.URL)
-		fmt.Print("\n")
-		color.Cyan("-------------------------------------------------\n")
+		color.Cyan("【" + *notification.Repository.Name + "】 : " + *notification.Subject.Title)
+		fmt.Print(*notification.Subject.URL + "\n")
+		color.Cyan("-------------------------------------------------")
 	}
 }

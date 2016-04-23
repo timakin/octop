@@ -97,7 +97,7 @@ func filterRepoLine() {
 			currentRepo[n] = matchedrepo{
 				RepoLines: RepoLines{
 					line:        f.line,
-					disp:        fmt.Sprintf("%s %s %s", UnreadCount, Owner, Repo),
+					disp:        fmt.Sprintf("%s %s", Owner, Repo),
 					UnreadCount: UnreadCount,
 					Owner:       Owner,
 					Repo:        Repo,

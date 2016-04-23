@@ -23,10 +23,8 @@ func CmdIssue(c *cli.Context) {
 	issues := i.GetIssues(selected[0].Owner, selected[0].Repo)
 
 	for _, issue := range issues {
-		fmt.Print(issue.Title)
-		fmt.Print("\n")
-		fmt.Print(issue.URL)
-		fmt.Print("\n")
-		color.Cyan("---------------------------------------\n")
+		color.Cyan(issue.Title)
+		fmt.Print(issue.URL + "\n")
+		color.Cyan("---------------------------------------")
 	}
 }

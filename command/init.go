@@ -21,6 +21,5 @@ func CmdInit(c *cli.Context) {
 	}
 
 	issues := i.GetIssues(selected[0].Owner, selected[0].Repo)
-	selectedRes, err := repl.ResSelectInterface(issues)
-	fmt.Println(selectedRes)
+	fmt.Println(issues)
 }

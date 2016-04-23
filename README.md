@@ -34,13 +34,7 @@ https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 octop n - notification tracking
 octop i - issue tracking, with an interactive selection of repo
 octop p - pull-reqs tracking, with an interactive selection of repo
-``
-
 ```
-
-> hot topics in all github news streams.
-```
-
 
 ## Reference
 

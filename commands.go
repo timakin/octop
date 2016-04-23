@@ -12,19 +12,19 @@ var GlobalFlags = []cli.Flag{}
 
 var Commands = []cli.Command{
 	{
-		Name:   "n",
+		Name:   "notification",
 		Usage:  "octop n - notification tracking",
 		Action: command.CmdNotification,
 		Flags:  []cli.Flag{},
 	},
 	{
-		Name:   "i",
+		Name:   "issue",
 		Usage:  "octop i - issue tracking with selection of repo",
 		Action: command.CmdIssue,
 		Flags:  []cli.Flag{},
 	},
 	{
-		Name:   "p",
+		Name:   "pr",
 		Usage:  "octop p - pull-reqs tracking with selection of repo",
 		Action: command.CmdPr,
 		Flags:  []cli.Flag{},

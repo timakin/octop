@@ -22,8 +22,8 @@ func CmdNotification(c *cli.Context) {
 
 	notifications := i.GetNotifications(selected[0].Owner, selected[0].Repo)
 	for _, notification := range notifications {
-		color.Cyan(*notification.Subject.Title)
-		fmt.Print(*notification.Subject.URL + "\n")
+		color.Cyan(notification.Title)
+		fmt.Print(notification.URL + "\n")
 		color.Cyan("-------------------------------------------------")
 	}
 }

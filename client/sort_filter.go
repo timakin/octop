@@ -46,8 +46,8 @@ func PullReqFilter(vs []github.PullRequest, f func(github.PullRequest) bool) []g
 	return vsf
 }
 
-func NotificationFilter(vs []github.Notification, f func(github.Notification) bool) []github.Notification {
-	vsf := make([]github.Notification, 0)
+func NotificationFilter(vs FilteredNotifications, f func(*FilteredNotification) bool) FilteredNotifications {
+	vsf := make(FilteredNotifications, 0)
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)

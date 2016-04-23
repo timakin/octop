@@ -8,10 +8,10 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-func (i Instance) GetNotifications(owner string, repo string) []github.Notification {
+func (i Instance) GetNotifications(owner string, repo string) FilteredNotifications {
 	cacheKey := "notifications_" + owner + "_" + repo
 	if cv, found := i.cache.Get(cacheKey); found {
-		cachedNotifications := cv.([]github.Notification)
+		cachedNotifications := cv.(FilteredNotifications)
 		return cachedNotifications
 	}
 	opt := &github.NotificationListOptions{All: true}
@@ -19,8 +19,10 @@ func (i Instance) GetNotifications(owner string, repo string) []github.Notificat
 	if err != nil {
 		log.Fatal(err)
 	}
-	i.cache.Set(cacheKey, notifications, cache.DefaultExpiration)
-	return notifications
+	filtered := i.filterNotifications(notifications)
+
+	i.cache.Set(cacheKey, filtered, cache.DefaultExpiration)
+	return filtered
 }
 
 func (i Instance) GetIssues(owner string, repo string) ResponseContents {
@@ -45,6 +47,19 @@ func (i Instance) convertIssuesToResContents(issues []github.Issue) ResponseCont
 		})
 	}
 	return res
+}
+
+func (i Instance) filterNotifications(notifications []github.Notification) FilteredNotifications {
+	var filtered FilteredNotifications
+	for _, notification := range notifications {
+		notification := notification
+		filtered = append(filtered, &FilteredNotification{
+			Title:      *notification.Subject.Title,
+			Repository: notification.Repository,
+			URL:        *notification.URL, // TODO: to HTMLURL
+		})
+	}
+	return filtered
 }
 
 func (i Instance) GetPullRequests(owner string, repo string) []github.PullRequest {
@@ -97,7 +112,7 @@ func (i Instance) getAuthenticatedUserId() *string {
 
 func (i Instance) countUnreadRepositoryNotification(owner *string, repoName *string) int {
 	notifications := i.GetNotifications(*owner, *repoName)
-	unreadRepositoryNotifications := NotificationFilter(notifications, func(n github.Notification) bool {
+	unreadRepositoryNotifications := NotificationFilter(notifications, func(n *FilteredNotification) bool {
 		return *n.Repository.Owner.Login == *owner && *n.Repository.Name == *repoName
 	})
 	return len(unreadRepositoryNotifications)

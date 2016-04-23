@@ -29,6 +29,12 @@ type NotificationOptions struct {
 	mentioned      bool
 }
 
+type FilteredNotification struct {
+	Title      string
+	Repository *github.Repository
+	URL        string
+}
+
 type RepoNotificationCounter struct {
 	Repository              *github.Repository
 	UnreadNotificationCount int
@@ -43,3 +49,4 @@ type ResponseContent struct {
 
 type RepoNotificationCounters []*RepoNotificationCounter
 type ResponseContents []*ResponseContent
+type FilteredNotifications []*FilteredNotification

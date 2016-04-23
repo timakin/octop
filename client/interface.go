@@ -38,6 +38,7 @@ type ResponseContent struct {
 	Title string
 	Body  string
 	Owner string
+	URL   string
 }
 
 type RepoNotificationCounters []*RepoNotificationCounter

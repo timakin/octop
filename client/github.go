@@ -40,6 +40,7 @@ func (i Instance) convertIssuesToResContents(issues []github.Issue) ResponseCont
 			Title: *issue.Title,
 			Owner: *issue.User.Login,
 			Body:  *issue.Body,
+			URL:   *issue.HTMLURL,
 		})
 	}
 	return res

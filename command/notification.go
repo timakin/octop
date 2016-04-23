@@ -10,14 +10,13 @@ import (
 )
 
 func CmdNotification(c *cli.Context) {
-	instance := client.New()
-	notifications := instance.GetNotifications()
+	i := client.New()
+	notifications := i.GetNotifications()
 	for _, notification := range notifications {
-		color.Cyan("-------------------------------------------------")
+		fmt.Print(*notification.Subject.Title)
 		fmt.Print("\n")
-		fmt.Print("Title: \t" + *notification.Subject.Title)
+		fmt.Print(*notification.Subject.URL)
 		fmt.Print("\n")
-		fmt.Print("Url: \t" + *notification.Subject.URL)
-		fmt.Print("\n")
+		color.Cyan("-------------------------------------------------\n")
 	}
 }

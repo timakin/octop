@@ -132,7 +132,7 @@ func filterRepoLine() {
 			currentRepo = append(currentRepo, matchedrepo{
 				RepoLines: RepoLines{
 					line:        f.line,
-					disp:        fmt.Sprintf("%s %s %s", UnreadCount, Owner, Repo),
+					disp:        fmt.Sprintf("%s %s", Owner, Repo),
 					UnreadCount: UnreadCount,
 					Owner:       Owner,
 					Repo:        Repo,
@@ -244,7 +244,7 @@ func NewRepoLines(line *client.RepoNotificationCounter) RepoLines {
 	UnreadCount, Owner, Repo, _ := SplitRepo(line)
 	Repolines := RepoLines{
 		line:        line,
-		disp:        fmt.Sprintf("%s %s %s", UnreadCount, Owner, Repo),
+		disp:        fmt.Sprintf("%s %s", Owner, Repo),
 		UnreadCount: UnreadCount,
 		Owner:       Owner,
 		Repo:        Repo,

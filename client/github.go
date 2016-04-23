@@ -3,6 +3,7 @@ package client
 import (
 	"log"
 	"sort"
+	"strings"
 
 	"github.com/google/go-github/github"
 	"github.com/patrickmn/go-cache"
@@ -56,7 +57,7 @@ func (i Instance) filterNotifications(notifications []github.Notification) Filte
 		filtered = append(filtered, &FilteredNotification{
 			Title:      *notification.Subject.Title,
 			Repository: notification.Repository,
-			URL:        *notification.URL, // TODO: to HTMLURL
+			URL:        i.toHTMLURL(notification),
 		})
 	}
 	return filtered
@@ -116,4 +117,10 @@ func (i Instance) countUnreadRepositoryNotification(owner *string, repoName *str
 		return *n.Repository.Owner.Login == *owner && *n.Repository.Name == *repoName
 	})
 	return len(unreadRepositoryNotifications)
+}
+
+func (i Instance) toHTMLURL(n github.Notification) string {
+	s := strings.Replace(*n.Subject.URL, "api.", "", 1)
+	s = strings.Replace(s, "repos/", "", 1)
+	return s
 }

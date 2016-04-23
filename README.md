@@ -21,7 +21,7 @@ And wished to finish off all tasks on terminal display as I could.
 
 ## Installation
 ```bash
-$ go get -d github.com/timakin/octop
+$ go get -d github.com/timakin/octopatrol
 ```
 
 After installed binary packed octopatrol command, authenticate your account for repository tracking.

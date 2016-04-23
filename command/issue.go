@@ -24,6 +24,7 @@ func CmdIssue(c *cli.Context) {
 
 	for _, issue := range issues {
 		color.Cyan(issue.Title)
+		fmt.Print(issue.Owner + "\n")
 		fmt.Print(issue.URL + "\n")
 		color.Cyan("---------------------------------------")
 	}

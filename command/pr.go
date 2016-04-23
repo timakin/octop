@@ -24,6 +24,7 @@ func CmdPr(c *cli.Context) {
 
 	for _, pullreq := range pullreqs {
 		color.Cyan(*pullreq.Title)
+		fmt.Print(*pullreq.User.Login + "\n")
 		fmt.Print(*pullreq.HTMLURL + "\n")
 		color.Cyan("----------------------------------------")
 	}

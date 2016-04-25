@@ -31,9 +31,9 @@ https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 
 ## Notification tracking
 ```
-octop n - notification tracking
-octop i - issue tracking, with an interactive selection of repo
-octop p - pull-reqs tracking, with an interactive selection of repo
+octop notification - notification tracking
+octop issue - issue tracking, with an interactive selection of repo
+octop pr - pull-reqs tracking, with an interactive selection of repo
 ```
 
 ## Reference

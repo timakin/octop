@@ -9,7 +9,24 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-func (i Instance) GetNotifications(owner string, repo string) FilteredNotifications {
+func (i Instance) GetNotifications() FilteredNotifications {
+	cacheKey := "notifications"
+	if cv, found := i.cache.Get(cacheKey); found {
+		cachedNotifications := cv.(FilteredNotifications)
+		return cachedNotifications
+	}
+	opt := &github.NotificationListOptions{All: true}
+	notifications, _, err := i.ghCli.Activity.ListNotifications(opt)
+	if err != nil {
+		log.Fatal(err)
+	}
+	filtered := i.filterNotifications(notifications)
+
+	i.cache.Set(cacheKey, filtered, cache.DefaultExpiration)
+	return filtered
+}
+
+func (i Instance) GetRepoNotifications(owner string, repo string) FilteredNotifications {
 	cacheKey := "notifications_" + owner + "_" + repo
 	if cv, found := i.cache.Get(cacheKey); found {
 		cachedNotifications := cv.(FilteredNotifications)
@@ -89,7 +106,9 @@ func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 		}
 		repoNotificationCounters[index] = repoNotificationCounter
 	}
+
 	sort.Sort(repoNotificationCounters)
+
 	return repoNotificationCounters
 }
 
@@ -112,7 +131,7 @@ func (i Instance) getAuthenticatedUserId() *string {
 }
 
 func (i Instance) countUnreadRepositoryNotification(owner *string, repoName *string) int {
-	notifications := i.GetNotifications(*owner, *repoName)
+	notifications := i.GetNotifications()
 	unreadRepositoryNotifications := NotificationFilter(notifications, func(n *FilteredNotification) bool {
 		return *n.Repository.Owner.Login == *owner && *n.Repository.Name == *repoName
 	})

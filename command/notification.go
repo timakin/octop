@@ -4,11 +4,10 @@ import (
 	"github.com/timakin/octop/client"
 
 	"fmt"
-	"log"
-
 	"github.com/codegangsta/cli"
 	"github.com/fatih/color"
 	"github.com/timakin/octop/repl"
+	"log"
 )
 
 func CmdNotification(c *cli.Context) {
@@ -20,7 +19,7 @@ func CmdNotification(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	notifications := i.GetNotifications(selected[0].Owner, selected[0].Repo)
+	notifications := i.GetRepoNotifications(selected[0].Owner, selected[0].Repo)
 	for _, notification := range notifications {
 		color.Cyan(notification.Title)
 		fmt.Print(notification.URL + "\n")

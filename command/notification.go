@@ -24,6 +24,6 @@ func CmdNotification(c *cli.Context) {
 	for _, notification := range notifications {
 		color.Cyan(notification.Title)
 		fmt.Print(notification.URL + "\n")
-		color.Cyan("-------------------------------------------------")
+		color.Cyan("---------------------------------------")
 	}
 }

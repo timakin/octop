@@ -3,6 +3,8 @@ package client
 import (
 	"time"
 
+	"net/url"
+
 	"github.com/google/go-github/github"
 	"github.com/patrickmn/go-cache"
 )
@@ -22,6 +24,10 @@ func New() *Instance {
 	}
 
 	return I
+}
+
+func (i *Instance) SetRemoteHost(baseUrl *url.URL) {
+	i.ghCli.BaseURL = baseUrl
 }
 
 type NotificationOptions struct {

@@ -15,19 +15,34 @@ var Commands = []cli.Command{
 		Name:   "notification",
 		Usage:  "octop notification - notification tracking",
 		Action: command.CmdNotification,
-		Flags:  []cli.Flag{},
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "enterprise, e",
+				Usage: "Access enterprise remote host",
+			},
+		},
 	},
 	{
 		Name:   "issue",
 		Usage:  "octop issue - issue tracking with selection of repo",
 		Action: command.CmdIssue,
-		Flags:  []cli.Flag{},
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "enterprise, e",
+				Usage: "Access enterprise remote host",
+			},
+		},
 	},
 	{
 		Name:   "pr",
 		Usage:  "octop pr - pull-reqs tracking with selection of repo",
 		Action: command.CmdPr,
-		Flags:  []cli.Flag{},
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "enterprise, e",
+				Usage: "Access enterprise remote host",
+			},
+		},
 	},
 }
 

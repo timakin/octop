@@ -2,6 +2,7 @@ package command
 
 import (
 	"github.com/timakin/octop/client"
+	"github.com/timakin/octop/constants"
 
 	"fmt"
 	"net/url"
@@ -23,7 +24,7 @@ func CmdIssue(c *cli.Context) {
 	if baseUrl != "" {
 		remoteHost, err := url.Parse(baseUrl)
 		if err != nil {
-			e := errors.Wrap(err, "Specifield remote host cannot be parsed.")
+			e := errors.Wrap(err, constants.ErrRemoteHostIsInvalid)
 			fmt.Print(e.Error())
 		}
 		i.SetRemoteHost(remoteHost)
@@ -32,7 +33,7 @@ func CmdIssue(c *cli.Context) {
 
 	selected, err := repl.RepoSelectInterface(repoNotificationCounters)
 	if err != nil {
-		e := errors.Wrap(err, "Repository selection has failed.")
+		e := errors.Wrap(err, constants.ErrRepoSelectFailed)
 		fmt.Print(e.Error())
 	}
 

@@ -1,12 +1,11 @@
 package client
 
 import (
+	"github.com/google/go-github/github"
+	"github.com/patrickmn/go-cache"
 	"log"
 	"sort"
 	"strings"
-
-	"github.com/google/go-github/github"
-	"github.com/patrickmn/go-cache"
 )
 
 func (i Instance) GetNotifications() FilteredNotifications {
@@ -113,13 +112,23 @@ func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 }
 
 func (i Instance) GetListFollowingRepository() []github.Repository {
-	opt := &github.ListOptions{PerPage: 100}
-	userId := i.getAuthenticatedUserId()
-	Repositories, _, err := i.ghCli.Activity.ListWatched(*userId, opt)
-	if err != nil {
-		log.Fatal(err)
+	var repositories []github.Repository
+	page := 1
+	contentsCount := 100
+	for contentsCount == 100 {
+		opt := &github.ListOptions{PerPage: 100, Page: page}
+		userId := i.getAuthenticatedUserId()
+		watchedRepos, _, err := i.ghCli.Activity.ListWatched(*userId, opt)
+		repositories = append(repositories, watchedRepos...)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		page += 1
+		contentsCount = len(watchedRepos)
 	}
-	return Repositories
+
+	return repositories
 }
 
 func (i Instance) getAuthenticatedUserId() *string {

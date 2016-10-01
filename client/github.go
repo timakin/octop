@@ -52,7 +52,7 @@ func (i Instance) GetIssues(owner string, repo string) ResponseContents {
 	return i.convertIssuesToResContents(issues)
 }
 
-func (i Instance) convertIssuesToResContents(issues []github.Issue) ResponseContents {
+func (i Instance) convertIssuesToResContents(issues []*github.Issue) ResponseContents {
 	var res ResponseContents
 	for _, issue := range issues {
 		issue := issue
@@ -66,7 +66,7 @@ func (i Instance) convertIssuesToResContents(issues []github.Issue) ResponseCont
 	return res
 }
 
-func (i Instance) filterNotifications(notifications []github.Notification) FilteredNotifications {
+func (i Instance) filterNotifications(notifications []*github.Notification) FilteredNotifications {
 	var filtered FilteredNotifications
 	for _, notification := range notifications {
 		notification := notification
@@ -79,14 +79,14 @@ func (i Instance) filterNotifications(notifications []github.Notification) Filte
 	return filtered
 }
 
-func (i Instance) GetPullRequests(owner string, repo string) []github.PullRequest {
+func (i Instance) GetPullRequests(owner string, repo string) []*github.PullRequest {
 	opt := &github.PullRequestListOptions{}
 	pullreqs, _, err := i.ghCli.PullRequests.List(owner, repo, opt)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	pullreqs = PullReqFilter(pullreqs, func(p github.PullRequest) bool {
+	pullreqs = PullReqFilter(pullreqs, func(p *github.PullRequest) bool {
 		isOpen := *p.State == "open"
 		return isOpen
 	})
@@ -100,7 +100,7 @@ func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 		repo := repo
 		unreadCount := i.countUnreadRepositoryNotification(repo.Owner.Login, repo.Name)
 		repoNotificationCounter := &RepoNotificationCounter{
-			Repository:              &repo,
+			Repository:              repo,
 			UnreadNotificationCount: unreadCount,
 		}
 		repoNotificationCounters[index] = repoNotificationCounter
@@ -111,8 +111,8 @@ func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 	return repoNotificationCounters
 }
 
-func (i Instance) GetListFollowingRepository() []github.Repository {
-	var repositories []github.Repository
+func (i Instance) GetListFollowingRepository() []*github.Repository {
+	var repositories []*github.Repository
 	page := 1
 	contentsCount := 100
 	for contentsCount == 100 {
@@ -147,7 +147,7 @@ func (i Instance) countUnreadRepositoryNotification(owner *string, repoName *str
 	return len(unreadRepositoryNotifications)
 }
 
-func (i Instance) toHTMLURL(n github.Notification) string {
+func (i Instance) toHTMLURL(n *github.Notification) string {
 	s := strings.Replace(*n.Subject.URL, "api.", "", 1)
 	s = strings.Replace(s, "repos/", "", 1)
 	return s

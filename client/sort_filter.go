@@ -16,8 +16,8 @@ func (r RepoNotificationCounters) Less(i, j int) bool {
 	return r[i].UnreadNotificationCount > r[j].UnreadNotificationCount
 }
 
-func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {
-	vsf := make([]github.Event, 0)
+func EventFilter(vs []*github.Event, f func(*github.Event) bool) []*github.Event {
+	vsf := make([]*github.Event, 0)
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)
@@ -26,8 +26,8 @@ func EventFilter(vs []github.Event, f func(github.Event) bool) []github.Event {
 	return vsf
 }
 
-func IssueEventFilter(vs []github.IssueEvent, f func(github.IssueEvent) bool) []github.IssueEvent {
-	vsf := make([]github.IssueEvent, 0)
+func IssueEventFilter(vs []*github.IssueEvent, f func(*github.IssueEvent) bool) []*github.IssueEvent {
+	vsf := make([]*github.IssueEvent, 0)
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)
@@ -36,8 +36,8 @@ func IssueEventFilter(vs []github.IssueEvent, f func(github.IssueEvent) bool) []
 	return vsf
 }
 
-func PullReqFilter(vs []github.PullRequest, f func(github.PullRequest) bool) []github.PullRequest {
-	vsf := make([]github.PullRequest, 0)
+func PullReqFilter(vs []*github.PullRequest, f func(*github.PullRequest) bool) []*github.PullRequest {
+	vsf := make([]*github.PullRequest, 0)
 	for _, v := range vs {
 		if f(v) {
 			vsf = append(vsf, v)

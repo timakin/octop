@@ -3,13 +3,13 @@ package client
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/oauth2"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"regexp"
-
-	"golang.org/x/oauth2"
+	"strings"
 )
 
 func getToken() string {
@@ -62,8 +62,9 @@ func getToken() string {
 }
 
 func newAuthenticatedClient() *http.Client {
+	formattedToken := strings.Replace(getToken(), "\n", "", -1)
 	TokenSource := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: getToken()},
+		&oauth2.Token{AccessToken: formattedToken},
 	)
 	TokenClient := oauth2.NewClient(oauth2.NoContext, TokenSource)
 	return TokenClient

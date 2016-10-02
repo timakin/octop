@@ -114,9 +114,9 @@ func (i Instance) GetRepoNotificationCounters() RepoNotificationCounters {
 func (i Instance) GetListFollowingRepository() []*github.Repository {
 	var repositories []*github.Repository
 	page := 1
-	contentsCount := 100
-	for contentsCount == 100 {
-		opt := &github.ListOptions{PerPage: 100, Page: page}
+	contentsCount := 1000
+	for contentsCount == 1000 {
+		opt := &github.ListOptions{PerPage: 1000, Page: page}
 		userId := i.getAuthenticatedUserId()
 		watchedRepos, _, err := i.ghCli.Activity.ListWatched(*userId, opt)
 		repositories = append(repositories, watchedRepos...)

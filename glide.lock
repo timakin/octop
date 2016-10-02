@@ -1,5 +1,5 @@
-hash: 85eb0e045c946b7164202029cd509abff273d19d48479f5f3b9d35c67efcb6b2
-updated: 2016-10-01T21:09:44.905523344+09:00
+hash: 85de28cafc5e5de369fe345822bb5066a3c520cb9981ea478e85b196f0d0a2fd
+updated: 2016-10-02T19:28:45.169181124+09:00
 imports:
 - name: github.com/codegangsta/cli
   version: a14d7d367bc02b1f57d88de97926727f2d936387
@@ -18,7 +18,7 @@ imports:
   subpackages:
   - query
 - name: github.com/k0kubun/pp
-  version: fa6ef2628b80777cf9af03bff7ad351a12b774c4
+  version: 36d5366f4ec038f9a76dd85c7b29074089bb9b9e
 - name: github.com/mattn/go-colorable
   version: 6c903ff4aa50920ca86087a280590b36b3152b9c
 - name: github.com/mattn/go-isatty
@@ -31,6 +31,8 @@ imports:
   version: 1881a9bccb818787f68c52bfba648c6cf34c34fa
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/timakin/tt
+  version: 9f4d3a99050d972639c50d997a2c0275d9727477
 - name: golang.org/x/net
   version: 0d8126fc6144eb5257485c59148128691e8ff849
   subpackages:

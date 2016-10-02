@@ -17,3 +17,4 @@ import:
 - package: golang.org/x/oauth2
 - package: github.com/k0kubun/pp
   version: ^2.1.0
+- package: github.com/timakin/tt
